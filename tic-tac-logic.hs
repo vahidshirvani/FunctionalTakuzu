@@ -24,6 +24,7 @@ avoidTripleForward (z:xs) acc = avoidTripleForward xs (z:acc)  -- 1 or 2 cells r
 avoidTripleBidirectional :: Row -> Row
 avoidTripleBidirectional row = avoidTripleForward (avoidTripleForward row []) []
 
+-- Input sample [[-1,-1,-1,-1,-1,-1],[0,0,-1,-1,1,1],[0,1,0,1,0,1],[-1,-1,-1,-1,-1,-1]]
 avoidTripleOne :: Board -> Board
 avoidTripleOne board =
     let rowsFixedBoard = map avoidTripleBidirectional board
@@ -36,6 +37,14 @@ avoidTripleOne board =
 ------------------------------------------------------------------------
 -- Solver
 ------------------------------------------------------------------------
+
+-- runRule [[-1,1,-1,-1,-1,-1],[0,0,-1,-1,1,1],[0,1,0,1,0,1],[-1,1,-1,-1,-1,-1]] avoidTripleOne
+runRule :: Board -> (Board -> Board) -> Board
+runRule board ruleFn =
+    let newBoard = ruleFn board
+    in if (board == newBoard)
+            then board
+            else runRule newBoard ruleFn
 
 solver :: Board -> IO ()
 solver board = print board
