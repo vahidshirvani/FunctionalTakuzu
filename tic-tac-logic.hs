@@ -1,13 +1,36 @@
-import Data.List (transpose)
+--import Data.List (transpose)
 
-type Board = [[Int]]
+type Row = [Int]
+type Board = [Row]
+
+opposite :: Int -> Int
+opposite 1 = 0
+opposite 0 = 1
+opposite (-1) = -1  -- the opposite of an empty cell is an empty cell
 
 ------------------------------------------------------------------------
 -- Algorithms from conceptispuzzles
+-- @see: http://www.conceptispuzzles.com/index.aspx?uri=puzzle/tic-tac-logic/techniques
 ------------------------------------------------------------------------
 
-avoidTriplesOne :: Board -> Board
-avoidTriplesOne board = board
+avoidTripleForward :: Row -> Row -> Row
+avoidTripleForward [] acc = acc  -- it will be called twice --> no reverse needed here
+avoidTripleForward (x:y:z:xs) acc =  -- > 2 cells remaining
+    if ((x == y) && (x /= -1) && (z == -1))
+        then avoidTripleForward (y:(opposite x):xs) (x:acc)
+        else avoidTripleForward (y:z:xs) (x:acc)
+avoidTripleForward (z:xs) acc = avoidTripleForward xs (z:acc)  -- 1 or 2 cells remaining
+
+avoidTripleBidirectional :: Row -> Row
+avoidTripleBidirectional row = avoidTripleForward (avoidTripleForward row []) []
+
+
+------------------------------------------------------------------------
+-- Solver
+------------------------------------------------------------------------
+
+solver :: Board -> IO ()
+solver board = print board
 
 ------------------------------------------------------------------------
 -- Reading input
@@ -27,10 +50,10 @@ printError msg = do
 readLines :: Char -> Int -> Int -> Board -> IO Board
 readLines gameChar _ 0 board = return (reverse board)
 readLines gameChar gameSize rowsLeft board = do
-    row <- getLine -- X
+    row <- getLine  -- X
     let rowList = (charToIntList row [])
     if (length rowList) == gameSize
-        then readLines gameChar gameSize (rowsLeft-1) (rowList:board)
+        then readLines gameChar gameSize (rowsLeft - 1) (rowList:board)
         else printError "Invalid row length"
 
 gameType :: [Char] -> IO Board
@@ -51,5 +74,5 @@ main :: IO ()
 main = do
     gameInfo <- getLine
     let board = gameType gameInfo
-    board >>= print -- this operator requires us to return IO
+    board >>= solver -- this operator requires us to return IO
      
