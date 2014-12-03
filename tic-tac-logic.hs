@@ -8,30 +8,63 @@ opposite 1 = 0
 opposite 0 = 1
 opposite (-1) = -1  -- the opposite of an empty cell is an empty cell
 
+
 ------------------------------------------------------------------------
 -- Algorithms from conceptispuzzles
 -- @see: http://www.conceptispuzzles.com/index.aspx?uri=puzzle/tic-tac-logic/techniques
 ------------------------------------------------------------------------
 
-avoidTripleForward :: Row -> Row -> Row
-avoidTripleForward [] acc = acc  -- it will be called twice --> no reverse needed here
-avoidTripleForward (x:y:z:xs) acc =  -- > 2 cells remaining
-    if ((x == y) && (x /= -1) && (z == -1))
-        then avoidTripleForward (y:(opposite x):xs) (x:acc)
-        else avoidTripleForward (y:z:xs) (x:acc)
-avoidTripleForward (z:xs) acc = avoidTripleForward xs (z:acc)  -- 1 or 2 cells remaining
+--
+-- High-order functions
+--
 
-avoidTripleBidirectional :: Row -> Row
-avoidTripleBidirectional row = avoidTripleForward (avoidTripleForward row []) []
-
--- Input sample [[-1,-1,-1,-1,-1,-1],[0,0,-1,-1,1,1],[0,1,0,1,0,1],[-1,-1,-1,-1,-1,-1]]
-avoidTripleOne :: Board -> Board
-avoidTripleOne board =
-    let rowsFixedBoard = map avoidTripleBidirectional board
+applyOnceInBothDirections :: Board -> (Row -> Row) -> Board
+applyOnceInBothDirections board rowFn =
+    let rowsFixedBoard = map rowFn board
         transposedBoard = transpose rowsFixedBoard
-        colsFixedBoard = map avoidTripleBidirectional transposedBoard
+        colsFixedBoard = map rowFn transposedBoard
         newFixedBoard = transpose colsFixedBoard
     in newFixedBoard
+
+applyRowFnUnidirectional :: (Row -> Row -> Row) -> (Row -> Row)
+applyRowFnUnidirectional rowFn = rowFn []
+
+applyRowFnBidirectional :: (Row -> Row -> Row) -> (Row -> Row)
+applyRowFnBidirectional rowFn = (rowFn []) . (rowFn [])
+
+--
+-- Avoiding triples 1
+--
+
+avoidTripleForward :: Row -> Row -> Row
+avoidTripleForward acc [] = acc  -- it will be called twice --> no reverse needed here
+avoidTripleForward acc (x:y:z:xs) =  -- > 2 cells remaining
+    if ((x == y) && (x /= -1) && (z == -1))
+        then avoidTripleForward (x:acc) (y:(opposite x):xs)
+        else avoidTripleForward (x:acc) (y:z:xs)
+avoidTripleForward acc (z:xs) = avoidTripleForward (z:acc) xs   -- 1 or 2 cells remaining
+
+
+-- avoidTripleOne [[-1,1,-1,-1,-1,-1],[0,0,-1,-1,1,1],[0,1,0,1,0,1],[-1,1,-1,-1,-1,-1]]
+avoidTripleOne :: Board -> Board
+avoidTripleOne board = applyOnceInBothDirections board (applyRowFnBidirectional avoidTripleForward)
+
+
+--
+-- Avoiding triples 2
+--
+
+checkMiddleCell :: Row -> Row -> Row
+checkMiddleCell acc [] = reverse acc
+checkMiddleCell acc (x:y:z:xs) =
+    if (x == z) && (y == -1)
+        then checkMiddleCell ((opposite x):x:acc) (z:xs)
+        else checkMiddleCell (x:acc) (y:z:xs)
+checkMiddleCell acc (x:xs) = checkMiddleCell (x:acc) xs
+
+
+avoidTripleTwo :: Board -> Board
+avoidTripleTwo board = applyOnceInBothDirections board (applyRowFnUnidirectional checkMiddleCell)
 
 
 ------------------------------------------------------------------------
@@ -48,6 +81,7 @@ runRule board ruleFn =
 
 solver :: Board -> IO ()
 solver board = print board
+
 
 ------------------------------------------------------------------------
 -- Reading input
@@ -82,6 +116,7 @@ gameType ('T':xs) = do
 
 gameType ('S':xs) = printError "sudoku"
 gameType _ = printError "unknown character"
+
 
 ------------------------------------------------------------------------
 -- Main
