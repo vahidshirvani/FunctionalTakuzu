@@ -1,3 +1,5 @@
+import Data.List (transpose)
+
 charToIntList :: [Char] -> [Int] -> [Int]
 charToIntList [] list = (reverse list)
 charToIntList ('X':xs) list = charToIntList xs (1:list)
