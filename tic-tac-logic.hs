@@ -1,4 +1,4 @@
---import Data.List (transpose)
+import Data.List (transpose)
 
 type Row = [Int]
 type Board = [Row]
@@ -23,6 +23,14 @@ avoidTripleForward (z:xs) acc = avoidTripleForward xs (z:acc)  -- 1 or 2 cells r
 
 avoidTripleBidirectional :: Row -> Row
 avoidTripleBidirectional row = avoidTripleForward (avoidTripleForward row []) []
+
+avoidTripleOne :: Board -> Board
+avoidTripleOne board =
+    let rowsFixedBoard = map avoidTripleBidirectional board
+        transposedBoard = transpose rowsFixedBoard
+        colsFixedBoard = map avoidTripleBidirectional transposedBoard
+        newFixedBoard = transpose colsFixedBoard
+    in newFixedBoard
 
 
 ------------------------------------------------------------------------
