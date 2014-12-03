@@ -1,9 +1,15 @@
-readLines :: Char -> Int -> [String] -> IO () 
+charToIntList :: [Char] -> [Int] -> [Int]
+charToIntList [] list = (reverse list)
+charToIntList ('X':xs) list = charToIntList xs (1:list)
+charToIntList ('O':xs) list = charToIntList xs (0:list)
+charToIntList ('.':xs) list = charToIntList xs (-1:list)
+
+readLines :: Char -> Int -> [[Int]] -> IO ()
 readLines t 0 board = 
     print (show (reverse board))
 readLines t x board = do
-    row <- getLine
-    readLines t (x-1) (row:board)
+    row <- getLine -- X
+    readLines t (x-1) ((charToIntList row []):board)
 
 gameType :: [Char] -> IO ()
 gameType ('T':xs) = do
