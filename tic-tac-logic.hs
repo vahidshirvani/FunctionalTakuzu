@@ -1,12 +1,19 @@
 import Data.List (transpose)
 
-type Row = [Int]
+type Cell = Int
+type Row = [Cell]
 type Board = [Row]
 
 opposite :: Int -> Int
 opposite 1 = 0
 opposite 0 = 1
 opposite (-1) = -1  -- the opposite of an empty cell is an empty cell
+
+countCellsOfType :: Cell -> (Row -> Int)
+countCellsOfType t = length . filter (== t)
+
+countEmptyCells :: Row -> Int
+countEmptyCells row = countCellsOfType (-1) row
 
 
 ------------------------------------------------------------------------
@@ -34,6 +41,8 @@ applyRowFnBidirectional rowFn = (rowFn []) . (rowFn [])
 
 --
 -- Avoiding triples 1
+-- 1 1 -1 -> 1 1 0
+-- 0 0 -1 -> 0 0 1
 --
 
 avoidTripleForward :: Row -> Row -> Row
@@ -53,6 +62,9 @@ avoidTripleOne board = applyOnceInBothDirections board (applyRowFnBidirectional 
 --
 -- Avoiding triples 2
 --
+-- 1 -1 1 -> 1 0 1
+-- 0 -1 0 -> 0 1 0
+--
 
 checkMiddleCell :: Row -> Row -> Row
 checkMiddleCell acc [] = reverse acc
@@ -65,6 +77,24 @@ checkMiddleCell acc (x:xs) = checkMiddleCell (x:acc) xs
 
 avoidTripleTwo :: Board -> Board
 avoidTripleTwo board = applyOnceInBothDirections board (applyRowFnUnidirectional checkMiddleCell)
+
+
+--
+-- Avoiding triples 3 (is not working yet)
+--
+-- e.g. 3 fields empty, 3xO, 2x1
+-- if we set one 1 cell to 0, the other two cells have to be 1
+-- but if they are neighbours with a neighbour 1 this would be invalid
+-- if half of the row is of the same type, e.g. 0, we have to fill up cells with 1
+--
+
+isOneStepBeforeFinishType :: Cell -> Row -> Bool
+isOneStepBeforeFinishType t row =
+    let numOfOccurences = countCellsOfType t row
+    in  -- + 1 because we can make a move
+        if (numOfOccurences + 1) == (div (length row) 2)
+        then True
+        else False
 
 
 ------------------------------------------------------------------------
