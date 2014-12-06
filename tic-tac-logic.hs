@@ -137,13 +137,22 @@ isOneStepBeforeFinishType t row =
         then True
         else False
 
-replace :: Int -> Row -> Board -> Board -> Board
-replace index row [] acc = reverse acc
-replace 0 row (x:xs) acc = 
-    replace (-1) row xs (row:acc)
-replace index row (x:xs) acc = 
-    replace (index-1) row xs (x:acc)     
-        
+replaceRowInBoard :: Int -> Row -> Board -> Board -> Board
+replaceRowInBoard index row [] acc = 
+    reverse acc
+replaceRowInBoard 0 row (x:xs) acc = 
+    replaceRowInBoard (-1) row xs (row:acc)
+replaceRowInBoard index row (x:xs) acc = 
+    replaceRowInBoard (index-1) row xs (x:acc)     
+
+replaceElementInRow :: Int -> Cell -> Row -> Row -> Row
+replaceElementInRow index xo [] acc = 
+    reverse acc
+replaceElementInRow 0 xo (r:rs) acc =
+    replaceElementInRow (-1) xo rs (xo:acc)
+replaceElementInRow index xo (r:rs) acc =
+    replaceElementInRow (index-1) xo rs (r:acc)
+    
 avoidTripleThree :: Board -> Board
 avoidTripleThree board = board
         
