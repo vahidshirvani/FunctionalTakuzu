@@ -15,6 +15,11 @@ countCellsOfType t = length . filter (== t)
 countEmptyCells :: Row -> Int
 countEmptyCells row = countCellsOfType (-1) row
 
+------------------------------------------------------------------------
+-- Verifier
+-- will check if a board is valid
+------------------------------------------------------------------------
+
 foundTripleInRow :: Row -> Bool
 foundTripleInRow [] = False
 foundTripleInRow (x:y:z:xs) = 
@@ -132,7 +137,16 @@ isOneStepBeforeFinishType t row =
         then True
         else False
 
-
+replace :: Int -> Row -> Board -> Board -> Board
+replace index row [] acc = reverse acc
+replace 0 row (x:xs) acc = 
+    replace (-1) row xs (row:acc)
+replace index row (x:xs) acc = 
+    replace (index-1) row xs (x:acc)     
+        
+avoidTripleThree :: Board -> Board
+avoidTripleThree board = board
+        
 ------------------------------------------------------------------------
 -- Solver
 ------------------------------------------------------------------------
