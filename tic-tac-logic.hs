@@ -36,17 +36,17 @@ foundTripleInRows (row:rows) =
         then True
         else foundTripleInRows rows
 
-checkTwoRows :: Row -> Board -> Bool        
-checkTwoRows rowA [] = False        
-checkTwoRows rowA (rowB:rows) =
+compareTwoRows :: Row -> Board -> Bool        
+compareTwoRows rowA [] = False        
+compareTwoRows rowA (rowB:rows) =
     if (rowA == rowB)
         then True
-        else checkTwoRows rowA rows
+        else compareTwoRows rowA rows
        
 twoRowsWereSimilar :: Board -> Bool
 twoRowsWereSimilar [] = False
 twoRowsWereSimilar (row:rows) =
-    if (checkTwoRows row rows)
+    if (compareTwoRows row rows)
         then True
         else twoRowsWereSimilar rows
    
@@ -137,24 +137,58 @@ isOneStepBeforeFinishType t row =
         then True
         else False
 
-replaceRowInBoard :: Int -> Row -> Board -> Board -> Board
-replaceRowInBoard index row [] acc = 
-    reverse acc
-replaceRowInBoard 0 row (x:xs) acc = 
-    replaceRowInBoard (-1) row xs (row:acc)
-replaceRowInBoard index row (x:xs) acc = 
-    replaceRowInBoard (index-1) row xs (x:acc)     
+-- replace the element in the specified index with the given element        
+replaceElementInRow :: Int -> Cell -> Row -> Row
+replaceElementInRow index xo row =
+    let helper i [] acc = reverse acc
+        helper 0 (r:rs) acc = helper (-1) rs (xo:acc)
+        helper i (r:rs) acc = helper (i-1) rs (r:acc)
+    in helper index row []
 
-replaceElementInRow :: Int -> Cell -> Row -> Row -> Row
-replaceElementInRow index xo [] acc = 
-    reverse acc
-replaceElementInRow 0 xo (r:rs) acc =
-    replaceElementInRow (-1) xo rs (xo:acc)
-replaceElementInRow index xo (r:rs) acc =
-    replaceElementInRow (index-1) xo rs (r:acc)
+-- replace the row in the specified index with the given row    
+replaceRowInBoard :: Int -> Row -> Board -> Board
+replaceRowInBoard index row board =
+    let helper i [] acc = reverse acc
+        helper 0 (x:xs) acc = helper (-1) xs (row:acc) 
+        helper i (x:xs) acc = helper (i-1) xs (x:acc)
+    in helper index board []
     
-avoidTripleThree :: Board -> Board
-avoidTripleThree board = board
+-- fill the empty spots with the specified element    
+fillRow :: Cell -> Row -> Row
+fillRow xo row =
+    let helper [] acc = reverse acc
+        helper ((-1):xs) acc = helper xs (xo:acc)
+        helper (x:xs) acc = helper xs (x:acc)
+    in helper row []
+
+-- get the indices were the element occur in the list    
+getElementIndices :: Cell -> Row -> [Int]
+getElementIndices xo row =
+    let helper [] i acc = reverse acc
+        helper (r:rs) i acc = 
+            if (r == xo)
+            then helper rs (i+1) (i:acc)
+            else helper rs (i+1) acc            
+    in helper row 0 []
+
+-- put the specified element once in every empty spot and return all combinations    
+-- getPossibleRows :: Cell -> Row -> [Row]
+-- getPossibleRows xo row =
+    -- let emptyIndices = []
+    -- in
+    
+-- avoidTripleThreeHelper :: Cell -> Board -> Int -> Board -> Board -> Board
+-- avoidTripleThreeHelper xo original index [] acc = 
+    -- reverse acc
+-- avoidTripleThreeHelper xo original index (r:rs) acc =   
+    -- if (isOneStepBeforeFinishType xo r)
+        -- then 
+            -- let s = [1]
+            -- in avoidTripleThreeHelper xo original (index+1) rs (r:acc)
+        -- else avoidTripleThreeHelper xo original (index+1) rs (r:acc)
+    
+-- avoidTripleThree :: Board -> Board
+-- avoidTripleThree board = board
         
 ------------------------------------------------------------------------
 -- Solver
