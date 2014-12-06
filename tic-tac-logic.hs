@@ -137,6 +137,14 @@ isOneStepBeforeFinishType t row =
         then True
         else False
 
+indexOfElement elem list =
+    let helper [] cnt = -1
+        helper (x:xs) cnt = 
+            if (x == elem)
+            then cnt
+            else helper xs (cnt+1)
+    in helper list 0
+        
 -- replace the element in the specified index with the given element        
 replaceElementInRow :: Int -> Cell -> Row -> Row
 replaceElementInRow index xo row =
@@ -172,23 +180,32 @@ getElementIndices xo row =
     in helper row 0 []
 
 -- put the specified element once in every empty spot and return all combinations    
--- getPossibleRows :: Cell -> Row -> [Row]
--- getPossibleRows xo row =
-    -- let emptyIndices = []
-    -- in
-    
--- avoidTripleThreeHelper :: Cell -> Board -> Int -> Board -> Board -> Board
--- avoidTripleThreeHelper xo original index [] acc = 
-    -- reverse acc
--- avoidTripleThreeHelper xo original index (r:rs) acc =   
-    -- if (isOneStepBeforeFinishType xo r)
-        -- then 
-            -- let s = [1]
-            -- in avoidTripleThreeHelper xo original (index+1) rs (r:acc)
-        -- else avoidTripleThreeHelper xo original (index+1) rs (r:acc)
-    
+getPossibleRows :: Cell -> Row -> [Row]
+getPossibleRows xo row =
+    let emptyIndices = getElementIndices (-1) row        
+    in [replaceElementInRow spot xo row | spot <- emptyIndices]
+
+checkRowForXO :: Cell -> Board -> Board
+checkRowForXO xo board =
+    let helper i [] acc = reverse acc
+        helper i (r:rs) acc = 
+            if (isOneStepBeforeFinishType xo r)
+            then 
+                let rows = getPossibleRows xo r
+                    completeRows = [fillRow (opposite xo) row | row <- rows]
+                    boards = [replaceRowInBoard i row board | row <- completeRows]
+                    bools = [isValid b | b <- boards]
+                    index = indexOfElement False bools                   
+                in 
+                    if (index == (-1))
+                    then helper (i+1) rs (r:acc)
+                    else helper (i+1) rs (((getPossibleRows (opposite xo) r) !! index):acc)
+            else helper (i+1) rs (r:acc)
+    in helper 0 board []
+        
 -- avoidTripleThree :: Board -> Board
 -- avoidTripleThree board = board
+
         
 ------------------------------------------------------------------------
 -- Solver
