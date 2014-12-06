@@ -15,6 +15,14 @@ countCellsOfType t = length . filter (== t)
 countEmptyCells :: Row -> Int
 countEmptyCells row = countCellsOfType (-1) row
 
+-- fill the empty spots with the specified element    
+fillRow :: Cell -> Row -> Row
+fillRow xo row =
+    let helper [] acc = reverse acc
+        helper ((-1):xs) acc = helper xs (xo:acc)
+        helper (x:xs) acc = helper xs (x:acc)
+    in helper row []
+
 ------------------------------------------------------------------------
 -- Verifier
 -- will check if a board is valid
@@ -160,14 +168,6 @@ replaceRowInBoard index row board =
         helper 0 (x:xs) acc = helper (-1) xs (row:acc) 
         helper i (x:xs) acc = helper (i-1) xs (x:acc)
     in helper index board []
-    
--- fill the empty spots with the specified element    
-fillRow :: Cell -> Row -> Row
-fillRow xo row =
-    let helper [] acc = reverse acc
-        helper ((-1):xs) acc = helper xs (xo:acc)
-        helper (x:xs) acc = helper xs (x:acc)
-    in helper row []
 
 -- get the indices were the element occur in the list    
 getElementIndices :: Cell -> Row -> [Int]
@@ -212,7 +212,34 @@ avoidTripleThree board =
         -- newBoard = transpose cO
         newBoard = rX
     in newBoard
-        
+
+--
+-- Completing a row or a column
+--
+    
+tryToFill :: Cell -> Row -> Row
+tryToFill xo row =
+    let numOfOccurences = countCellsOfType xo row
+    in 
+        if (numOfOccurences == (div (length row) 2))
+        then fillRow (opposite xo) row
+        else row 
+    
+tryToCompleteRow :: Cell -> Board -> Board
+tryToCompleteRow xo board =
+    let helper [] acc = reverse acc 
+        helper (r:rs) acc = helper rs ((tryToFill xo r):acc)
+    in helper board []
+    
+completingRowOrColumn :: Board -> Board
+completingRowOrColumn board = 
+    let rX = tryToCompleteRow 1 board
+        rO = tryToCompleteRow 0 rX
+        cX = tryToCompleteRow 1 (transpose rO)
+        cO = tryToCompleteRow 0 cX
+        newBoard = transpose cO
+    in newBoard
+   
 ------------------------------------------------------------------------
 -- Solver
 ------------------------------------------------------------------------
