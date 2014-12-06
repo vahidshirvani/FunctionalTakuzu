@@ -224,21 +224,14 @@ tryToFill xo row =
         if (numOfOccurences == (div (length row) 2))
         then fillRow (opposite xo) row
         else row 
-    
-tryToCompleteRow :: Cell -> Board -> Board
-tryToCompleteRow xo board =
-    let helper [] acc = reverse acc 
-        helper (r:rs) acc = helper rs ((tryToFill xo r):acc)
-    in helper board []
+
+tryToFillBoth :: Row -> Row
+tryToFillBoth = 
+    (tryToFill 0) . (tryToFill 1)
     
 completingRowOrColumn :: Board -> Board
 completingRowOrColumn board = 
-    let rX = tryToCompleteRow 1 board
-        rO = tryToCompleteRow 0 rX
-        cX = tryToCompleteRow 1 (transpose rO)
-        cO = tryToCompleteRow 0 cX
-        newBoard = transpose cO
-    in newBoard
+    applyOnceInBothDirections board tryToFillBoth
    
 ------------------------------------------------------------------------
 -- Solver
