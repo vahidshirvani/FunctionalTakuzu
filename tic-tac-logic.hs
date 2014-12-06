@@ -203,9 +203,15 @@ checkRowForXO xo board =
             else helper (i+1) rs (r:acc)
     in helper 0 board []
         
--- avoidTripleThree :: Board -> Board
--- avoidTripleThree board = board
-
+avoidTripleThree :: Board -> Board
+avoidTripleThree board = 
+    let rX = checkRowForXO 1 board
+        -- rO = checkRowForXO 0 rX
+        -- cX = checkRowForXO 1 (transpose rO)
+        -- cO = checkRowForXO 0 cX
+        -- newBoard = transpose cO
+        newBoard = rX
+    in newBoard
         
 ------------------------------------------------------------------------
 -- Solver
