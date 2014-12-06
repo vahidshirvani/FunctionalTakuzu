@@ -15,6 +15,28 @@ countCellsOfType t = length . filter (== t)
 countEmptyCells :: Row -> Int
 countEmptyCells row = countCellsOfType (-1) row
 
+-- if triple is found in row return false
+noTripleInRow :: Row -> Bool
+noTripleInRow [] = True
+noTripleInRow (x:y:z:xs) = 
+    if (x == y) && (y == z)
+        then False
+        else noTripleInRow (y:z:xs)
+noTripleInRow (x:xs) = 
+    noTripleInRow xs    
+    
+-- if triple is found in board return false
+noTripleInRows :: Board -> Bool
+noTripleInRows [] = True
+noTripleInRows (row:rows) = 
+    if (noTripleInRow row)
+        then noTripleInRows rows
+        else False
+
+
+isValid :: Board -> Bool
+isValid board = 
+    (noTripleInRows board) && (noTripleInRows (transpose board))
 
 ------------------------------------------------------------------------
 -- Algorithms from conceptispuzzles
