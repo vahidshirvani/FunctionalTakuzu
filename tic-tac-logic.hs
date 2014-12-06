@@ -15,28 +15,42 @@ countCellsOfType t = length . filter (== t)
 countEmptyCells :: Row -> Int
 countEmptyCells row = countCellsOfType (-1) row
 
--- if triple is found in row return false
-noTripleInRow :: Row -> Bool
-noTripleInRow [] = True
-noTripleInRow (x:y:z:xs) = 
+foundTripleInRow :: Row -> Bool
+foundTripleInRow [] = False
+foundTripleInRow (x:y:z:xs) = 
     if (x == y) && (y == z)
-        then False
-        else noTripleInRow (y:z:xs)
-noTripleInRow (x:xs) = 
-    noTripleInRow xs    
-    
--- if triple is found in board return false
-noTripleInRows :: Board -> Bool
-noTripleInRows [] = True
-noTripleInRows (row:rows) = 
-    if (noTripleInRow row)
-        then noTripleInRows rows
-        else False
+        then True
+        else foundTripleInRow (y:z:xs)
+foundTripleInRow (x:xs) = 
+    foundTripleInRow xs    
 
+foundTripleInRows :: Board -> Bool
+foundTripleInRows [] = False
+foundTripleInRows (row:rows) = 
+    if (foundTripleInRow row)
+        then True
+        else foundTripleInRows rows
 
+checkTwoRows :: Row -> Board -> Bool        
+checkTwoRows rowA [] = False        
+checkTwoRows rowA (rowB:rows) =
+    if (rowA == rowB)
+        then True
+        else checkTwoRows rowA rows
+       
+twoRowsWereSimilar :: Board -> Bool
+twoRowsWereSimilar [] = False
+twoRowsWereSimilar (row:rows) =
+    if (checkTwoRows row rows)
+        then True
+        else twoRowsWereSimilar rows
+   
 isValid :: Board -> Bool
 isValid board = 
-    (noTripleInRows board) && (noTripleInRows (transpose board))
+    (not (foundTripleInRows board)) && 
+    (not (foundTripleInRows (transpose board))) &&
+    (not (twoRowsWereSimilar board)) &&
+    (not (twoRowsWereSimilar (transpose board)))
 
 ------------------------------------------------------------------------
 -- Algorithms from conceptispuzzles
