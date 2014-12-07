@@ -44,17 +44,17 @@ foundTripleInRows (row:rows) =
         then True
         else foundTripleInRows rows
 
-compareTwoRows :: Row -> Board -> Bool        
-compareTwoRows rowA [] = False        
-compareTwoRows rowA (rowB:rows) =
+rowEqualOneRowInRows :: Row -> Board -> Bool        
+rowEqualOneRowInRows rowA [] = False        
+rowEqualOneRowInRows rowA (rowB:rows) =
     if (rowA == rowB)
         then True
-        else compareTwoRows rowA rows
+        else rowEqualOneRowInRows rowA rows
        
 twoRowsWereSimilar :: Board -> Bool
 twoRowsWereSimilar [] = False
 twoRowsWereSimilar (row:rows) =
-    if (compareTwoRows row rows)
+    if (rowEqualOneRowInRows row rows)
         then True
         else twoRowsWereSimilar rows
    
@@ -232,7 +232,53 @@ tryToFillBoth =
 completingRowOrColumn :: Board -> Board
 completingRowOrColumn board = 
     applyOnceInBothDirections board tryToFillBoth
-   
+
+--
+-- Avoiding row or column duplication
+--
+
+compareTwoRows :: Row -> Row -> Row
+compareTwoRows rowA rowB =
+    let helper [] [] acc = reverse acc
+        helper (x:xs) (y:ys) acc = 
+            if (x == y)
+            then helper xs ys (x:acc)
+            else 
+                if (x == (-1))
+                then helper xs ys ((opposite y):acc)
+                else rowA
+    in helper rowA rowB []
+
+compareRowAgainstRows :: Row -> [Row] -> Row
+compareRowAgainstRows row [] = row
+compareRowAgainstRows row (r:rs) = 
+    let result = compareTwoRows row r
+    in 
+        if (result == row)
+        then compareRowAgainstRows row rs
+        else result
+        
+getCompleteRows :: Board -> [Row]
+getCompleteRows board =
+    let helper [] acc = reverse acc
+        helper (r:rs) acc = 
+            if ((countEmptyCells r) == 0)
+            then helper rs (r:acc)
+            else helper rs acc
+    in helper board []
+
+-- avoidRowDuplicates :: Board -> Board
+-- avoidRowDuplicates board = 
+    -- let completeRows = getCompleteRows board
+        -- helper [] acc = reverse acc
+        -- helper (r:rs) acc = 
+            -- if ((countEmptyCells r) == 2)
+            -- then helper rs ((compareTwoRows r ):acc)
+            -- else helper rs (r:acc)
+    -- in helper board []
+    
+
+    
 ------------------------------------------------------------------------
 -- Solver
 ------------------------------------------------------------------------
