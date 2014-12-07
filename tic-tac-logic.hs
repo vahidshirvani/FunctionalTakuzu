@@ -137,11 +137,11 @@ avoidTripleTwo board = applyOnceInBothDirections board (applyRowFnUnidirectional
 -- if half of the row is of the same type, e.g. 0, we have to fill up cells with 1
 --
 
-isOneStepBeforeFinishType :: Cell -> Row -> Bool
-isOneStepBeforeFinishType t row =
+xStepBeforeFinish :: Cell -> Cell -> Row -> Bool
+xStepBeforeFinish empty t row =
     let numOfOccurences = countCellsOfType t row
     in  -- + 1 because we can make a move
-        if (numOfOccurences + 1) == (div (length row) 2)
+        if (numOfOccurences + empty) == (div (length row) 2)
         then True
         else False
 
@@ -185,11 +185,11 @@ getPossibleRows xo row =
     let emptyIndices = getElementIndices (-1) row        
     in [replaceElementInRow spot xo row | spot <- emptyIndices]
 
-checkRowForXO :: Cell -> Board -> Board
-checkRowForXO xo board =
+solveByEliminatingWrongs :: Cell -> Board -> Board
+solveByEliminatingWrongs xo board =
     let helper i [] acc = reverse acc
         helper i (r:rs) acc = 
-            if (isOneStepBeforeFinishType xo r)
+            if (xStepBeforeFinish 1 xo r)
             then 
                 let rows = getPossibleRows xo r
                     completeRows = [fillRow (opposite xo) row | row <- rows]
@@ -205,10 +205,10 @@ checkRowForXO xo board =
         
 avoidTripleThree :: Board -> Board
 avoidTripleThree board = 
-    let rX = checkRowForXO 1 board
-        -- rO = checkRowForXO 0 rX
-        -- cX = checkRowForXO 1 (transpose rO)
-        -- cO = checkRowForXO 0 cX
+    let rX = solveByEliminatingWrongs 1 board
+        -- rO = solveByEliminatingWrongs 0 rX
+        -- cX = solveByEliminatingWrongs 1 (transpose rO)
+        -- cO = solveByEliminatingWrongs 0 cX
         -- newBoard = transpose cO
         newBoard = rX
     in newBoard
@@ -293,6 +293,33 @@ avoidingRowOrColumnDuplication board =
         colsFixedBoard = avoidRowDuplicates transposedBoard
         newFixedBoard = transpose colsFixedBoard
     in newFixedBoard
+
+--
+-- Advanced technique 1
+--
+
+-- we found out the right answer by making a wrong move
+solveByEliminatingWrongs2 :: Cell -> Board -> Board
+solveByEliminatingWrongs2 xo board =
+    let helper i [] acc = reverse acc
+        helper i (r1:rs) acc = 
+            if (xStepBeforeFinish 2 xo r1)
+            then 
+                let rows1 = getPossibleRows xo r1
+                    indices = [
+                        let 
+                            rows2 = getPossibleRows xo r2
+                            completeRows = [fillRow (opposite xo) row | row <- rows2]
+                            boards = [replaceRowInBoard i row board | row <- completeRows]
+                            bools = [isValid b | b <- boards]
+                        in indexOfElement True bools | r2 <- rows1]                   
+                    index = indexOfElement (-1) indices
+                in 
+                    if (index == (-1))
+                    then helper (i+1) rs (r1:acc)
+                    else helper (i+1) rs (((getPossibleRows (opposite xo) r1) !! index):acc)
+            else helper (i+1) rs (r1:acc)
+    in helper 0 board []
     
 ------------------------------------------------------------------------
 -- Solver
