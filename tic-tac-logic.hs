@@ -330,11 +330,10 @@ solveByEliminatingWrongs2 xo board =
 advancedTechnique :: Board -> Board
 advancedTechnique board = 
     let rX = solveByEliminatingWrongs2 1 board
-        -- rO = solveByEliminatingWrongs2 0 rX
-        -- cX = solveByEliminatingWrongs2 1 (transpose rO)
-        -- cO = solveByEliminatingWrongs2 0 cX
-        -- newBoard = transpose cO
-        newBoard = rX
+        rO = solveByEliminatingWrongs2 0 rX
+        cX = solveByEliminatingWrongs2 1 (transpose rO)
+        cO = solveByEliminatingWrongs2 0 cX
+        newBoard = transpose cO
     in newBoard
     
 ------------------------------------------------------------------------
