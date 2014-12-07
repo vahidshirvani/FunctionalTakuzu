@@ -237,6 +237,8 @@ completingRowOrColumn board =
 -- Avoiding row or column duplication
 --
 
+-- if the difference between the two rows are limited to two empty spots
+-- then return a complete row which is different from the second row
 compareTwoRows :: Row -> Row -> Row
 compareTwoRows rowA rowB =
     let helper [] [] acc = reverse acc
@@ -249,6 +251,10 @@ compareTwoRows rowA rowB =
                 else rowA
     in helper rowA rowB []
 
+-- compare a non complete row with some other completed rows 
+-- and return a different completed version if possible
+-- e.g. input [1,-1,-1,1] [[1,0,1,1]]
+-- will output [1,1,0,1]
 compareRowAgainstRows :: Row -> [Row] -> Row
 compareRowAgainstRows row [] = row
 compareRowAgainstRows row (r:rs) = 
@@ -257,7 +263,8 @@ compareRowAgainstRows row (r:rs) =
         if (result == row)
         then compareRowAgainstRows row rs
         else result
-        
+
+-- will rerutn a list of all the complete rows in the board
 getCompleteRows :: Board -> [Row]
 getCompleteRows board =
     let helper [] acc = reverse acc
@@ -267,17 +274,25 @@ getCompleteRows board =
             else helper rs acc
     in helper board []
 
--- avoidRowDuplicates :: Board -> Board
--- avoidRowDuplicates board = 
-    -- let completeRows = getCompleteRows board
-        -- helper [] acc = reverse acc
-        -- helper (r:rs) acc = 
-            -- if ((countEmptyCells r) == 2)
-            -- then helper rs ((compareTwoRows r ):acc)
-            -- else helper rs (r:acc)
-    -- in helper board []
-    
+-- goes through the board row-wise and tries to fill the rows
+-- that only have two empty spots left    
+avoidRowDuplicates :: Board -> Board
+avoidRowDuplicates board = 
+    let completeRows = getCompleteRows board
+        helper [] acc = reverse acc
+        helper (r:rs) acc = 
+            if ((countEmptyCells r) == 2)
+            then helper rs ((compareRowAgainstRows r completeRows):acc)
+            else helper rs (r:acc)
+    in helper board []    
 
+avoidingRowOrColumnDuplication :: Board -> Board
+avoidingRowOrColumnDuplication board =
+    let rowsFixedBoard = avoidRowDuplicates board
+        transposedBoard = transpose rowsFixedBoard
+        colsFixedBoard = avoidRowDuplicates transposedBoard
+        newFixedBoard = transpose colsFixedBoard
+    in newFixedBoard
     
 ------------------------------------------------------------------------
 -- Solver
