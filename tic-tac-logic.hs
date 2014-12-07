@@ -217,11 +217,10 @@ solveByEliminatingWrongs xo board =
 avoidTripleThree :: Board -> Board
 avoidTripleThree board = 
     let rX = solveByEliminatingWrongs 1 board
-        -- rO = solveByEliminatingWrongs 0 rX
-        -- cX = solveByEliminatingWrongs 1 (transpose rO)
-        -- cO = solveByEliminatingWrongs 0 cX
-        -- newBoard = transpose cO
-        newBoard = rX
+        rO = solveByEliminatingWrongs 0 rX
+        cX = solveByEliminatingWrongs 1 (transpose rO)
+        cO = solveByEliminatingWrongs 0 cX
+        newBoard = transpose cO
     in newBoard
 
 --
