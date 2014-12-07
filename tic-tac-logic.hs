@@ -327,14 +327,22 @@ solveByEliminatingWrongs2 xo board =
             else helper (i+1) rs (r1:acc)
     in helper 0 board []
 
-advancedTechnique :: Board -> Board
-advancedTechnique board = 
+advancedTechniqueOne :: Board -> Board
+advancedTechniqueOne board = 
     let rX = solveByEliminatingWrongs2 1 board
         rO = solveByEliminatingWrongs2 0 rX
         cX = solveByEliminatingWrongs2 1 (transpose rO)
         cO = solveByEliminatingWrongs2 0 cX
         newBoard = transpose cO
     in newBoard
+
+--
+-- Advanced technique 2
+--
+
+-- The verification phase for the avoidTripleThree will also check for duplicate rows    
+advancedTechniqueTwo :: Board -> Board
+advancedTechniqueTwo board = avoidTripleThree board    
     
 ------------------------------------------------------------------------
 -- Solver
