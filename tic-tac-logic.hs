@@ -129,7 +129,7 @@ avoidTripleTwo board = applyOnceInBothDirections board (applyRowFnUnidirectional
 
 
 --
--- Avoiding triples 3 (is not working yet)
+-- Avoiding triples 3 
 --
 -- e.g. 3 fields empty, 3xO, 2x1
 -- if we set one 1 cell to 0, the other two cells have to be 1
@@ -274,7 +274,7 @@ compareRowAgainstRows row (r:rs) =
         then compareRowAgainstRows row rs
         else result
 
--- will rerutn a list of all the complete rows in the board
+-- will return a list of all the complete rows in the board
 getCompleteRows :: Board -> [Row]
 getCompleteRows board =
     let helper [] acc = reverse acc
