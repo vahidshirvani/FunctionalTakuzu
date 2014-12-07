@@ -185,6 +185,20 @@ getPossibleRows xo row =
     let emptyIndices = getElementIndices (-1) row        
     in [replaceElementInRow spot xo row | spot <- emptyIndices]
 
+getIndexOfVerifiedBoard :: Cell -> Board -> [Row] -> Int -> Bool -> Int
+getIndexOfVerifiedBoard xo board rows index cond =
+    let helper [] i = (-1)
+        helper (r:rs) i = 
+            let completeRow = fillRow (opposite xo) r
+                newBoard = replaceRowInBoard index completeRow board
+                bool = isValid newBoard
+            in 
+                if (bool == cond)
+                then i
+                else helper rs (i+1)
+    in helper rows 0
+    
+-- we found out the right answer by making a wrong move
 solveByEliminatingWrongs :: Cell -> Board -> Board
 solveByEliminatingWrongs xo board =
     let helper i [] acc = reverse acc
@@ -192,10 +206,7 @@ solveByEliminatingWrongs xo board =
             if (xStepBeforeFinish 1 xo r)
             then 
                 let rows = getPossibleRows xo r
-                    completeRows = [fillRow (opposite xo) row | row <- rows]
-                    boards = [replaceRowInBoard i row board | row <- completeRows]
-                    bools = [isValid b | b <- boards]
-                    index = indexOfElement False bools                   
+                    index = getIndexOfVerifiedBoard xo board rows i False                
                 in 
                     if (index == (-1))
                     then helper (i+1) rs (r:acc)
@@ -307,12 +318,8 @@ solveByEliminatingWrongs2 xo board =
             then 
                 let rows1 = getPossibleRows xo r1
                     indices = [
-                        let 
-                            rows2 = getPossibleRows xo r2
-                            completeRows = [fillRow (opposite xo) row | row <- rows2]
-                            boards = [replaceRowInBoard i row board | row <- completeRows]
-                            bools = [isValid b | b <- boards]
-                        in indexOfElement True bools | r2 <- rows1]                   
+                        let rows2 = getPossibleRows xo r2                            
+                        in getIndexOfVerifiedBoard xo board rows2 i True | r2 <- rows1]                        
                     index = indexOfElement (-1) indices
                 in 
                     if (index == (-1))
@@ -320,6 +327,16 @@ solveByEliminatingWrongs2 xo board =
                     else helper (i+1) rs (((getPossibleRows (opposite xo) r1) !! index):acc)
             else helper (i+1) rs (r1:acc)
     in helper 0 board []
+
+advancedTechnique :: Board -> Board
+advancedTechnique board = 
+    let rX = solveByEliminatingWrongs2 1 board
+        -- rO = solveByEliminatingWrongs2 0 rX
+        -- cX = solveByEliminatingWrongs2 1 (transpose rO)
+        -- cO = solveByEliminatingWrongs2 0 cX
+        -- newBoard = transpose cO
+        newBoard = rX
+    in newBoard
     
 ------------------------------------------------------------------------
 -- Solver
