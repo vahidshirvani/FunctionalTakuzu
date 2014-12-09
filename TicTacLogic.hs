@@ -1,3 +1,5 @@
+module TicTacLogic where
+
 import Data.List (transpose)
 
 type Cell = Int
@@ -15,7 +17,7 @@ countCellsOfType t = length . filter (== t)
 countEmptyCells :: Row -> Int
 countEmptyCells row = countCellsOfType (-1) row
 
--- fill the empty spots with the specified element    
+-- fill the empty spots with the specified element
 fillRow :: Cell -> Row -> Row
 fillRow xo row =
     let helper [] acc = reverse acc
@@ -30,37 +32,37 @@ fillRow xo row =
 
 foundTripleInRow :: Row -> Bool
 foundTripleInRow [] = False
-foundTripleInRow (x:y:z:xs) = 
+foundTripleInRow (x:y:z:xs) =
     if (x == y) && (y == z)
         then True
         else foundTripleInRow (y:z:xs)
-foundTripleInRow (x:xs) = 
-    foundTripleInRow xs    
+foundTripleInRow (x:xs) =
+    foundTripleInRow xs
 
 foundTripleInRows :: Board -> Bool
 foundTripleInRows [] = False
-foundTripleInRows (row:rows) = 
+foundTripleInRows (row:rows) =
     if (foundTripleInRow row)
         then True
         else foundTripleInRows rows
 
-rowEqualOneRowInRows :: Row -> Board -> Bool        
-rowEqualOneRowInRows rowA [] = False        
+rowEqualOneRowInRows :: Row -> Board -> Bool
+rowEqualOneRowInRows rowA [] = False
 rowEqualOneRowInRows rowA (rowB:rows) =
     if (rowA == rowB)
         then True
         else rowEqualOneRowInRows rowA rows
-       
+
 twoRowsWereSimilar :: Board -> Bool
 twoRowsWereSimilar [] = False
 twoRowsWereSimilar (row:rows) =
     if (rowEqualOneRowInRows row rows)
         then True
         else twoRowsWereSimilar rows
-   
+
 isValid :: Board -> Bool
-isValid board = 
-    (not (foundTripleInRows board)) && 
+isValid board =
+    (not (foundTripleInRows board)) &&
     (not (foundTripleInRows (transpose board))) &&
     (not (twoRowsWereSimilar board)) &&
     (not (twoRowsWereSimilar (transpose board)))
@@ -129,7 +131,7 @@ avoidTripleTwo board = applyOnceInBothDirections board (applyRowFnUnidirectional
 
 
 --
--- Avoiding triples 3 
+-- Avoiding triples 3
 --
 -- e.g. 3 fields empty, 3xO, 2x1
 -- if we set one 1 cell to 0, the other two cells have to be 1
@@ -147,13 +149,13 @@ xStepBeforeFinish empty t row =
 
 indexOfElement elem list =
     let helper [] cnt = -1
-        helper (x:xs) cnt = 
+        helper (x:xs) cnt =
             if (x == elem)
             then cnt
             else helper xs (cnt+1)
     in helper list 0
-        
--- replace the element in the specified index with the given element        
+
+-- replace the element in the specified index with the given element
 replaceElementInRow :: Int -> Cell -> Row -> Row
 replaceElementInRow index xo row =
     let helper i [] acc = reverse acc
@@ -161,61 +163,61 @@ replaceElementInRow index xo row =
         helper i (r:rs) acc = helper (i-1) rs (r:acc)
     in helper index row []
 
--- replace the row in the specified index with the given row    
+-- replace the row in the specified index with the given row
 replaceRowInBoard :: Int -> Row -> Board -> Board
 replaceRowInBoard index row board =
     let helper i [] acc = reverse acc
-        helper 0 (x:xs) acc = helper (-1) xs (row:acc) 
+        helper 0 (x:xs) acc = helper (-1) xs (row:acc)
         helper i (x:xs) acc = helper (i-1) xs (x:acc)
     in helper index board []
 
--- get the indices were the element occur in the list    
+-- get the indices were the element occur in the list
 getElementIndices :: Cell -> Row -> [Int]
 getElementIndices xo row =
     let helper [] i acc = reverse acc
-        helper (r:rs) i acc = 
+        helper (r:rs) i acc =
             if (r == xo)
             then helper rs (i+1) (i:acc)
-            else helper rs (i+1) acc            
+            else helper rs (i+1) acc
     in helper row 0 []
 
--- put the specified element once in every empty spot and return all combinations    
+-- put the specified element once in every empty spot and return all combinations
 getPossibleRows :: Cell -> Row -> [Row]
 getPossibleRows xo row =
-    let emptyIndices = getElementIndices (-1) row        
+    let emptyIndices = getElementIndices (-1) row
     in [replaceElementInRow spot xo row | spot <- emptyIndices]
 
 getIndexOfVerifiedBoard :: Cell -> Board -> [Row] -> Int -> Bool -> Int
 getIndexOfVerifiedBoard xo board rows index cond =
     let helper [] i = (-1)
-        helper (r:rs) i = 
+        helper (r:rs) i =
             let completeRow = fillRow (opposite xo) r
                 newBoard = replaceRowInBoard index completeRow board
                 bool = isValid newBoard
-            in 
+            in
                 if (bool == cond)
                 then i
                 else helper rs (i+1)
     in helper rows 0
-    
+
 -- we found out the right answer by making a wrong move
 solveByEliminatingWrongs :: Cell -> Board -> Board
 solveByEliminatingWrongs xo board =
     let helper i [] acc = reverse acc
-        helper i (r:rs) acc = 
+        helper i (r:rs) acc =
             if (xStepBeforeFinish 1 xo r)
-            then 
+            then
                 let rows = getPossibleRows xo r
-                    index = getIndexOfVerifiedBoard xo board rows i False                
-                in 
+                    index = getIndexOfVerifiedBoard xo board rows i False
+                in
                     if (index == (-1))
                     then helper (i+1) rs (r:acc)
                     else helper (i+1) rs (((getPossibleRows (opposite xo) r) !! index):acc)
             else helper (i+1) rs (r:acc)
     in helper 0 board []
-        
+
 avoidTripleThree :: Board -> Board
-avoidTripleThree board = 
+avoidTripleThree board =
     let rX = solveByEliminatingWrongs 1 board
         rO = solveByEliminatingWrongs 0 rX
         cX = solveByEliminatingWrongs 1 (transpose rO)
@@ -226,21 +228,21 @@ avoidTripleThree board =
 --
 -- Completing a row or a column
 --
-    
+
 tryToFill :: Cell -> Row -> Row
 tryToFill xo row =
     let numOfOccurences = countCellsOfType xo row
-    in 
+    in
         if (numOfOccurences == (div (length row) 2))
         then fillRow (opposite xo) row
-        else row 
+        else row
 
 tryToFillBoth :: Row -> Row
-tryToFillBoth = 
+tryToFillBoth =
     (tryToFill 0) . (tryToFill 1)
-    
+
 completingRowOrColumn :: Board -> Board
-completingRowOrColumn board = 
+completingRowOrColumn board =
     applyOnceInBothDirections board tryToFillBoth
 
 --
@@ -252,24 +254,24 @@ completingRowOrColumn board =
 compareTwoRows :: Row -> Row -> Row
 compareTwoRows rowA rowB =
     let helper [] [] acc = reverse acc
-        helper (x:xs) (y:ys) acc = 
+        helper (x:xs) (y:ys) acc =
             if (x == y)
             then helper xs ys (x:acc)
-            else 
+            else
                 if (x == (-1))
                 then helper xs ys ((opposite y):acc)
                 else rowA
     in helper rowA rowB []
 
--- compare a non complete row with some other completed rows 
+-- compare a non complete row with some other completed rows
 -- and return a different completed version if possible
 -- e.g. input [1,-1,-1,1] [[1,0,1,1]]
 -- will output [1,1,0,1]
 compareRowAgainstRows :: Row -> [Row] -> Row
 compareRowAgainstRows row [] = row
-compareRowAgainstRows row (r:rs) = 
+compareRowAgainstRows row (r:rs) =
     let result = compareTwoRows row r
-    in 
+    in
         if (result == row)
         then compareRowAgainstRows row rs
         else result
@@ -278,23 +280,23 @@ compareRowAgainstRows row (r:rs) =
 getCompleteRows :: Board -> [Row]
 getCompleteRows board =
     let helper [] acc = reverse acc
-        helper (r:rs) acc = 
+        helper (r:rs) acc =
             if ((countEmptyCells r) == 0)
             then helper rs (r:acc)
             else helper rs acc
     in helper board []
 
 -- goes through the board row-wise and tries to fill the rows
--- that only have two empty spots left    
+-- that only have two empty spots left
 avoidRowDuplicates :: Board -> Board
-avoidRowDuplicates board = 
+avoidRowDuplicates board =
     let completeRows = getCompleteRows board
         helper [] acc = reverse acc
-        helper (r:rs) acc = 
+        helper (r:rs) acc =
             if ((countEmptyCells r) == 2)
             then helper rs ((compareRowAgainstRows r completeRows):acc)
             else helper rs (r:acc)
-    in helper board []    
+    in helper board []
 
 avoidingRowOrColumnDuplication :: Board -> Board
 avoidingRowOrColumnDuplication board =
@@ -312,15 +314,15 @@ avoidingRowOrColumnDuplication board =
 solveByEliminatingWrongs2 :: Cell -> Board -> Board
 solveByEliminatingWrongs2 xo board =
     let helper i [] acc = reverse acc
-        helper i (r1:rs) acc = 
+        helper i (r1:rs) acc =
             if (xStepBeforeFinish 2 xo r1)
-            then 
+            then
                 let rows1 = getPossibleRows xo r1
                     indices = [
-                        let rows2 = getPossibleRows xo r2                            
-                        in getIndexOfVerifiedBoard xo board rows2 i True | r2 <- rows1]                        
+                        let rows2 = getPossibleRows xo r2
+                        in getIndexOfVerifiedBoard xo board rows2 i True | r2 <- rows1]
                     index = indexOfElement (-1) indices
-                in 
+                in
                     if (index == (-1))
                     then helper (i+1) rs (r1:acc)
                     else helper (i+1) rs (((getPossibleRows (opposite xo) r1) !! index):acc)
@@ -328,7 +330,7 @@ solveByEliminatingWrongs2 xo board =
     in helper 0 board []
 
 advancedTechniqueOne :: Board -> Board
-advancedTechniqueOne board = 
+advancedTechniqueOne board =
     let rX = solveByEliminatingWrongs2 1 board
         rO = solveByEliminatingWrongs2 0 rX
         cX = solveByEliminatingWrongs2 1 (transpose rO)
@@ -340,13 +342,14 @@ advancedTechniqueOne board =
 -- Advanced technique 2
 --
 
--- The verification phase for the avoidTripleThree will also check for duplicate rows    
+-- The verification phase for the avoidTripleThree will also check for duplicate rows
 advancedTechniqueTwo :: Board -> Board
-advancedTechniqueTwo board = avoidTripleThree board    
-    
-------------------------------------------------------------------------
--- Solver
-------------------------------------------------------------------------
+advancedTechniqueTwo board = avoidTripleThree board
+
+
+--
+-- Run Logic
+--
 
 -- runRule [[-1,1,-1,-1,-1,-1],[0,0,-1,-1,1,1],[0,1,0,1,0,1],[-1,1,-1,-1,-1,-1]] avoidTripleOne
 runRule :: Board -> (Board -> Board) -> Board
@@ -355,53 +358,3 @@ runRule board ruleFn =
     in if (board == newBoard)
             then board
             else runRule newBoard ruleFn
-
-solver :: Board -> IO ()
-solver board = print board
-
-
-------------------------------------------------------------------------
--- Reading input
-------------------------------------------------------------------------
-
-charToIntList :: [Char] -> [Int] -> [Int]
-charToIntList [] list = (reverse list)
-charToIntList ('X':xs) list = charToIntList xs (1:list)
-charToIntList ('O':xs) list = charToIntList xs (0:list)
-charToIntList ('.':xs) list = charToIntList xs (-1:list)
-
-printError :: String -> IO Board
-printError msg = do
-    putStrLn msg
-    return [[]]
-
-readLines :: Char -> Int -> Int -> Board -> IO Board
-readLines gameChar _ 0 board = return (reverse board)
-readLines gameChar gameSize rowsLeft board = do
-    row <- getLine  -- X
-    let rowList = (charToIntList row [])
-    if (length rowList) == gameSize
-        then readLines gameChar gameSize (rowsLeft - 1) (rowList:board)
-        else printError "Invalid row length"
-
-gameType :: [Char] -> IO Board
-gameType ('T':xs) = do
-    let pairs = (map (\x -> read x :: Int) (words xs))
-    if ((pairs !! 0) == (pairs !! 1)) && ((mod (pairs !! 0) 2) == 0) 
-        then (readLines 'T' (pairs !! 0) (pairs !! 0) [])
-        else printError "incorrect input values"
-
-gameType ('S':xs) = printError "sudoku"
-gameType _ = printError "unknown character"
-
-
-------------------------------------------------------------------------
--- Main
-------------------------------------------------------------------------
-
-main :: IO ()
-main = do
-    gameInfo <- getLine
-    let board = gameType gameInfo
-    board >>= solver -- this operator requires us to return IO
-     
