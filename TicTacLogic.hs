@@ -92,6 +92,8 @@ applyRowFnBidirectional rowFn = (rowFn []) . (rowFn [])
 
 --
 -- Avoiding triples 1
+-- = Basic techniques 1
+--
 -- 1 1 -1 -> 1 1 0
 -- 0 0 -1 -> 0 0 1
 --
@@ -112,6 +114,7 @@ avoidTripleOne board = applyOnceInBothDirections board (applyRowFnBidirectional 
 
 --
 -- Avoiding triples 2
+-- = Basic techniques 2
 --
 -- 1 -1 1 -> 1 0 1
 -- 0 -1 0 -> 0 1 0
@@ -132,6 +135,7 @@ avoidTripleTwo board = applyOnceInBothDirections board (applyRowFnUnidirectional
 
 --
 -- Avoiding triples 3
+-- = Basic techniques 3
 --
 -- e.g. 3 fields empty, 3xO, 2x1
 -- if we set one 1 cell to 0, the other two cells have to be 1
@@ -227,6 +231,7 @@ avoidTripleThree board =
 
 --
 -- Completing a row or a column
+-- = Basic techniques 4
 --
 
 tryToFill :: Cell -> Row -> Row
@@ -247,6 +252,7 @@ completingRowOrColumn board =
 
 --
 -- Avoiding row or column duplication
+-- = Extra Requirements (a) Basic Technique 5. (1 point)
 --
 
 -- if the difference between the two rows are limited to two empty spots
@@ -308,6 +314,7 @@ avoidingRowOrColumnDuplication board =
 
 --
 -- Advanced technique 1
+-- = Extra Requirements (b) Advanced Technique 1. (2 points)
 --
 
 -- we found out the right answer by making a wrong move
@@ -340,6 +347,7 @@ advancedTechniqueOne board =
 
 --
 -- Advanced technique 2
+-- = Extra Requirements (c) Advanced Technique 2. (2 points)
 --
 
 -- The verification phase for the avoidTripleThree will also check for duplicate rows

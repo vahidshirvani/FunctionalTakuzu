@@ -30,6 +30,7 @@ To deploy the project outside of the sandbox just execute the following command
 
 ```bash 
 $ cabal build
+$ cabal run
 ```
 
 ## Testing
