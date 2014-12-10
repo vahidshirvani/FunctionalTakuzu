@@ -344,7 +344,7 @@ advancedTechniqueOne board =
 
 -- The verification phase for the avoidTripleThree will also check for duplicate rows
 advancedTechniqueTwo :: Board -> Board
-advancedTechniqueTwo board = avoidTripleThree board
+advancedTechniqueTwo = avoidTripleThree
 
 
 --
@@ -355,6 +355,6 @@ advancedTechniqueTwo board = avoidTripleThree board
 runRule :: Board -> (Board -> Board) -> Board
 runRule board ruleFn =
     let newBoard = ruleFn board
-    in if (board == newBoard)
+    in if board == newBoard
             then board
             else runRule newBoard ruleFn

@@ -10,22 +10,22 @@ import Test.Tasty.HUnit
 testFillOppositeAfterPairs :: Row -> Row -> TestTree
 testFillOppositeAfterPairs input output = testCase
     "Testing 1 Row with two pairs (X X -1) Bidirectional"
-    ((applyRowFnBidirectional avoidTripleForward input) @?= output)
+    (applyRowFnBidirectional avoidTripleForward input @?= output)
 
 testFillOppositeAfterPairsUnidirectional :: Row -> Row -> TestTree
 testFillOppositeAfterPairsUnidirectional input output = testCase
     "Testing 1 Row with two pairs (X X -1) Unidirectional"
-    ((applyRowFnUnidirectional avoidTripleForward input) @?= (reverse output))
+    (applyRowFnUnidirectional avoidTripleForward input @?= reverse output)
 
 testAvoidTripleOne :: Board -> Board -> TestTree
 testAvoidTripleOne input output = testCase
     "Testing 1 Board with pairs (X X -1) in both directions"
-    ((avoidTripleOne input) @?= output)
+    (avoidTripleOne input @?= output)
 
 testAvoidTripleOneRecursive :: Board -> Board -> TestTree
 testAvoidTripleOneRecursive input output = testCase
     "Testing 1 Board with pairs (X X -1) in both directions, with RECURSION"
-    ((runRule input avoidTripleOne) @?= output)
+    (runRule input avoidTripleOne @?= output)
 
 
 --
@@ -34,7 +34,7 @@ testAvoidTripleOneRecursive input output = testCase
 testAvoidTripleTwoRow :: Row -> Row -> TestTree
 testAvoidTripleTwoRow input output = testCase
     "Testing 1 Row with empty middle cell (X -1 X)"
-    ((applyRowFnUnidirectional checkMiddleCell) input @?= output)
+    (applyRowFnUnidirectional checkMiddleCell input @?= output)
 
 testAvoidTripleTwo :: Board -> Board -> TestTree
 testAvoidTripleTwo input output = testCase
@@ -44,7 +44,7 @@ testAvoidTripleTwo input output = testCase
 testAvoidTripleTwoRecursive :: Board -> Board -> TestTree
 testAvoidTripleTwoRecursive input output = testCase
     "Testing 1 Board with empty middle cell (X -1 X), with RECURSION"
-    ((runRule input avoidTripleTwo) @?= output)
+    (runRule input avoidTripleTwo @?= output)
 
 
 --
