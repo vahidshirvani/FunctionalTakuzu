@@ -151,6 +151,7 @@ xStepBeforeFinish empty t row =
         then True
         else False
 
+indexOfElement :: Cell -> Row -> Int 
 indexOfElement elem list =
     let helper [] cnt = -1
         helper (x:xs) cnt =

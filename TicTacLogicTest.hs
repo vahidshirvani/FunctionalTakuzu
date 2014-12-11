@@ -51,8 +51,33 @@ testAvoidTripleTwoRecursive input output = testCase
 -- Avoiding triples 3
 --
 
-testAvoidTripleTree :: Board -> Board -> TestTree
-testAvoidTripleTree input output = testCase
+testXStepBeforeFinish :: Cell -> Cell -> Row -> Bool -> TestTree
+testXStepBeforeFinish input1 input2 input3 output = testCase
+    "Testing 1 Row to see if it is in our interest"
+    (xStepBeforeFinish input1 input2 input3 @?= output)
+
+testIndexOfElement :: Cell -> Row -> Int -> TestTree
+testIndexOfElement input1 input2 output = testCase
+    "Testing 1 Row to find the index of element"
+    (indexOfElement input1 input2 @?= output)
+
+testReplaceElementInRow :: Int -> Cell -> Row -> Row -> TestTree
+testReplaceElementInRow input1 input2 input3 output = testCase
+    "Testing 1 Row to replace an element"
+    (replaceElementInRow input1 input2 input3 @?= output)
+
+testGetElementIndices :: Cell -> Row -> [Int] -> TestTree
+testGetElementIndices input1 input2 output = testCase
+    "Testing 1 Row to find indices of an element occurrences"
+    (getElementIndices input1 input2 @?= output)
+
+testGetPossibleRows :: Cell -> Row -> [Row] -> TestTree
+testGetPossibleRows input1 input2 output = testCase
+    "Testing 1 Row to find all possible combinations"
+    (getPossibleRows input1 input2 @?= output)
+
+testAvoidTripleThree :: Board -> Board -> TestTree
+testAvoidTripleThree input output = testCase
     "Testing 1 Board that can be filled up"
     (avoidTripleThree input @?= output)
 
@@ -145,6 +170,24 @@ allTests = testGroup "TicTacLogicTests" [
             ]
         ,
         testGroup "Avoiding triples 3" [
+                -- first test will identify row as interesting while second row is not
+                testXStepBeforeFinish 1 1 [1,-1,-1,-1] True,
+                testXStepBeforeFinish 1 1 [1,-1,-1,-1,-1,0] False,
+
+                -- first test will manage to find element while next test will return (-1)
+                testIndexOfElement 1 [-1,-1,-1,-1,-1,1] 5,
+                testIndexOfElement 1 [-1,-1,-1,-1,-1,-1] (-1),
+
+                -- test will manage to replace element
+                testReplaceElementInRow 1 1 [-1,-1,-1,-1,-1,-1] [-1,1,-1,-1,-1,-1],
+
+                -- test will check if returned indices are correct
+                testGetElementIndices 1 [-1,1,-1,1,-1,1] [1,3,5],
+                testGetElementIndices 1 [-1,-1,-1,-1,-1,-1] [],
+
+                -- test will check if returned indices are correct
+                testGetPossibleRows 1 [-1,1,-1,-1] [[1,1,-1,-1],[-1,1,1,-1],[-1,1,-1,1]]
+
                 --testAvoidTripleTree [[0,1,-1,0,-1,0,1,0]] [[0,1,1,0,1,0,1,0]]
             ]
         ,
