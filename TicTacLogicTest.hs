@@ -62,8 +62,33 @@ testAvoidTripleTree input output = testCase
 
 testTryToFill :: Cell -> Row -> Row -> TestTree
 testTryToFill t input output = testCase
-    "Testing 1 Row with four empty cells (1,1,1,1,-1,-1,-1,-1)"
+    "Testing 1 Row with various empty cells (1,1,-1,-1)"
     (tryToFill t input @?= output)
+
+testCompletingRowOrColumn :: Board -> Board -> TestTree
+testCompletingRowOrColumn input output = testCase
+    "Testing 1 Board that can be filled up (1,1,-1,-1), ONLY 1 iteration"
+    (completingRowOrColumn input @?= output)
+
+--
+-- Avoiding row or column duplication
+--
+
+testCompareTwoRows :: Row -> Row -> Row -> TestTree
+testCompareTwoRows input1 input2 output = testCase
+    "Testing 1 Row against another row (1,-1), (1,0)"
+    (compareTwoRows input1 input2 @?= output)
+
+testCompareRowAgainstRows :: Row -> [Row] -> Row -> TestTree
+testCompareRowAgainstRows input1 input2 output = testCase
+    "Testing 1 Row against another rows (1,-1), ((1,0))"
+    (compareRowAgainstRows input1 input2 @?= output)
+
+testGetCompleteRows :: Board -> [Row] -> TestTree
+testGetCompleteRows input output = testCase
+    "Testing 1 Board to return complete rows ((1,-1), (1,0))"
+    (getCompleteRows input @?= output)
+
 
 --
 -- Aggregate all tests and run
@@ -115,7 +140,26 @@ allTests = testGroup "TicTacLogicTests" [
             ]
         ,
         testGroup "Completing a row or a column" [
-                testTryToFill 1 [1,1,1,1,-1,-1,-1,-1] [1,1,1,1,0,0,0,0]
+                -- row should be filled in first test but not in second test
+                testTryToFill 1 [1,1,1,1,-1,-1,-1,-1] [1,1,1,1,0,0,0,0],
+                testTryToFill 1 [1,1,1,-1,-1,-1,-1,-1] [1,1,1,-1,-1,-1,-1,-1],
+                
+                -- both rows and columns should be filled in if possible
+                testCompletingRowOrColumn [[-1,0,1,-1],[0,-1,1,0],[1,0,0,-1],[1,1,-1,0]] [[0,0,1,1],[0,1,1,0],[1,0,0,1],[1,1,0,0]]
+            ]
+        ,
+        testGroup "Avoiding row or column duplication" [
+                -- row should be filled in first test but not in second test
+                testCompareTwoRows [1,-1,-1,1] [1,0,1,1] [1,1,0,1],
+                testCompareTwoRows [1,-1,-1,1] [1,0,1,0] [1,-1,-1,1],
+
+                -- row should be filled in first test but not in second test
+                testCompareRowAgainstRows [1,-1,-1,1] [[1,0,1,1],[1,0,1,0]] [1,1,0,1],
+                testCompareRowAgainstRows [1,-1,-1,1] [[1,0,1,0],[0,0,1,1]] [1,-1,-1,1],
+
+                -- should return one row in the first test but not any in second test
+                testGetCompleteRows [[1,-1,-1,1],[1,0,1,0],[0,0,-1,1]] [[1,0,1,0]],
+                testGetCompleteRows [[1,-1,-1,1],[1,-1,1,0],[0,0,-1,1]] []
             ]
     ]
 
