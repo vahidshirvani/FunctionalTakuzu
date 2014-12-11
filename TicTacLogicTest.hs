@@ -89,6 +89,15 @@ testGetCompleteRows input output = testCase
     "Testing 1 Board to return complete rows ((1,-1), (1,0))"
     (getCompleteRows input @?= output)
 
+testAvoidRowDuplicates :: Board -> Board -> TestTree
+testAvoidRowDuplicates input output = testCase
+    "Testing 1 Board that can be filled up ((1,-1), (1,0)), ONLY row-wise"
+    (avoidRowDuplicates input @?= output)
+
+testAvoidingRowOrColumnDuplication :: Board -> Board -> TestTree
+testAvoidingRowOrColumnDuplication input output = testCase
+    "Testing 1 Board that can be filled up ((1,-1), (1,0))"
+    (avoidingRowOrColumnDuplication input @?= output)
 
 --
 -- Aggregate all tests and run
@@ -159,7 +168,14 @@ allTests = testGroup "TicTacLogicTests" [
 
                 -- should return one row in the first test but not any in second test
                 testGetCompleteRows [[1,-1,-1,1],[1,0,1,0],[0,0,-1,1]] [[1,0,1,0]],
-                testGetCompleteRows [[1,-1,-1,1],[1,-1,1,0],[0,0,-1,1]] []
+                testGetCompleteRows [[1,-1,-1,1],[1,-1,1,0],[0,0,-1,1]] [],
+                
+                -- first test should return a complete board but not the second 
+                testAvoidRowDuplicates [[0,-1,1,-1],[0,1,1,0],[1,-1,0,-1],[1,1,0,0]] [[0,0,1,1],[0,1,1,0],[1,0,0,1],[1,1,0,0]],
+                testAvoidRowDuplicates [[-1,0,1,-1],[0,-1,1,0],[1,-1,-1,1],[-1,1,0,0]] [[-1,0,1,-1],[0,-1,1,0],[1,-1,-1,1],[-1,1,0,0]],
+
+                -- first test should return a complete board but not the second 
+                testAvoidingRowOrColumnDuplication [[0,0,1,1],[-1,1,-1,0],[-1,0,-1,1],[1,1,0,0]] [[0,0,1,1],[0,1,1,0],[1,0,0,1],[1,1,0,0]]
             ]
     ]
 
