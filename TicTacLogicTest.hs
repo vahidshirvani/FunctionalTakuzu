@@ -57,6 +57,15 @@ testAvoidTripleTree input output = testCase
     (avoidTripleThree input @?= output)
 
 --
+-- Completing a row or a column
+--
+
+testTryToFill :: Cell -> Row -> Row -> TestTree
+testTryToFill t input output = testCase
+    "Testing 1 Row with four empty cells (1,1,1,1,-1,-1,-1,-1)"
+    (tryToFill t input @?= output)
+
+--
 -- Aggregate all tests and run
 --
 
@@ -103,6 +112,10 @@ allTests = testGroup "TicTacLogicTests" [
         ,
         testGroup "Avoiding triples 3" [
                 --testAvoidTripleTree [[0,1,-1,0,-1,0,1,0]] [[0,1,1,0,1,0,1,0]]
+            ]
+        ,
+        testGroup "Completing a row or a column" [
+                testTryToFill 1 [1,1,1,1,-1,-1,-1,-1] [1,1,1,1,0,0,0,0]
             ]
     ]
 

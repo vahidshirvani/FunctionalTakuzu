@@ -4,11 +4,12 @@ cabal-dev
 *.hi
 *.chi
 *.chs.h
+*.*~
+*.iml
 .virtualenv
 .hsenv
 .cabal-sandbox/
 cabal.sandbox.config
 cabal.config
 .idea/
-*.iml
 tic-tac-logic
