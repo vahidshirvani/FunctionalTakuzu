@@ -143,6 +143,20 @@ testSolveByEliminatingWrongs2 input1 input2 output = testCase
     "Testing 1 Board that can be filled up, ONLY row-wise"
     (solveByEliminatingWrongs2 input1 input2 @?= output)
 
+testAdvancedTechniqueOne :: Board -> Board -> TestTree
+testAdvancedTechniqueOne input1 output = testCase
+    "Testing 1 Board that can be filled up"
+    (advancedTechniqueOne input1 @?= output)
+
+--
+-- Advanced technique 2
+--
+
+testAdvancedTechniqueTwo :: Board -> Board -> TestTree
+testAdvancedTechniqueTwo input output = testCase
+    "Testing 1 Board that can be filled up"
+    (advancedTechniqueTwo input @?= output)
+
 --
 -- Aggregate all tests and run
 --
@@ -244,13 +258,21 @@ allTests = testGroup "TicTacLogicTests" [
                 testAvoidRowDuplicates [[0,-1,1,-1],[0,1,1,0],[1,-1,0,-1],[1,1,0,0]] [[0,0,1,1],[0,1,1,0],[1,0,0,1],[1,1,0,0]],
                 testAvoidRowDuplicates [[-1,0,1,-1],[0,-1,1,0],[1,-1,-1,1],[-1,1,0,0]] [[-1,0,1,-1],[0,-1,1,0],[1,-1,-1,1],[-1,1,0,0]],
 
-                -- first test should return a complete board but not the second 
+                -- test should return a complete board, it's solved by looking at columns
                 testAvoidingRowOrColumnDuplication [[0,0,1,1],[-1,1,-1,0],[-1,0,-1,1],[1,1,0,0]] [[0,0,1,1],[0,1,1,0],[1,0,0,1],[1,1,0,0]]
             ]
         ,
         testGroup "Advanced technique 1" [
-                -- first test should return a complete board but not the second 
-                testSolveByEliminatingWrongs2 1 [[-1,-1,-1,-1],[0,1,1,0],[1,0,0,1],[1,1,0,0]] [[0,-1,-1,-1],[0,1,1,0],[1,0,0,1],[1,1,0,0]]
+                -- test will find a one right value by making a mistake, row-wise
+                testSolveByEliminatingWrongs2 1 [[-1,-1,-1,-1],[0,1,1,0],[1,0,0,1],[1,1,0,0]] [[0,-1,-1,-1],[0,1,1,0],[1,0,0,1],[1,1,0,0]],
+
+                -- test solver in both row and columns
+                testAdvancedTechniqueOne [[0,-1,1,1],[0,-1,1,0],[1,-1,0,1],[1,-1,0,0]] [[0,0,1,1],[0,-1,1,0],[1,-1,0,1],[1,-1,0,0]]
+            ]
+        ,
+        testGroup "Advanced technique 2" [
+                -- test solver in both row and columns
+                testAdvancedTechniqueTwo [[0,-1,-1,1],[0,1,1,0],[1,0,0,1],[1,1,0,0]] [[0,0,-1,1],[0,1,1,0],[1,0,0,1],[1,1,0,0]]
             ]
     ]
 
