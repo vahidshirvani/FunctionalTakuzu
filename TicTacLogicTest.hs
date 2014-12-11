@@ -66,6 +66,11 @@ testReplaceElementInRow input1 input2 input3 output = testCase
     "Testing 1 Row to replace an element"
     (replaceElementInRow input1 input2 input3 @?= output)
 
+testReplaceRowInBoard :: Int -> Row -> Board -> Board -> TestTree
+testReplaceRowInBoard input1 input2 input3 output = testCase
+    "Testing 1 Board to replace a row"
+    (replaceRowInBoard input1 input2 input3 @?= output)
+
 testGetElementIndices :: Cell -> Row -> [Int] -> TestTree
 testGetElementIndices input1 input2 output = testCase
     "Testing 1 Row to find indices of an element occurrences"
@@ -211,8 +216,11 @@ allTests = testGroup "TicTacLogicTests" [
                 testIndexOfElement 1 [-1,-1,-1,-1,-1,1] 5,
                 testIndexOfElement 1 [-1,-1,-1,-1,-1,-1] (-1),
 
-                -- test will manage to replace element
+                -- test will manage to replace an element in row
                 testReplaceElementInRow 1 1 [-1,-1,-1,-1,-1,-1] [-1,1,-1,-1,-1,-1],
+
+                -- test will manage to replace a row in board
+                testReplaceRowInBoard 1 [1,1] [[-1,-1],[-1,-1]] [[-1,-1],[1,1]],
 
                 -- test will check if returned indices are correct
                 testGetElementIndices 1 [-1,1,-1,1,-1,1] [1,3,5],
