@@ -6,6 +6,20 @@ import TicTacLogic
 -- Solver
 ------------------------------------------------------------------------
 
+convertRow :: Row -> [Char]
+convertRow row = 
+    let helper [] acc = acc
+        helper (0:xs) acc = helper xs ('O':acc)
+        helper (1:xs) acc = helper xs ('X':acc)
+        helper ((-1):xs) acc = helper xs ('.':acc)
+    in helper row []
+
+convertBoard :: Board -> [Char]
+convertBoard board = 
+    let helper [] acc = reverse acc
+        helper (r:rs) acc = helper rs ((convertRow r) ++ "\r\n" ++ acc)
+    in helper board []
+
 goThroughAllRules :: Board -> [(Board -> Board)] -> Board
 goThroughAllRules board [] = board
 goThroughAllRules board (rule:rules) =
@@ -25,18 +39,15 @@ solve board rules =
 
 solver :: Board -> IO ()
 solver board = do
-    print board
-    let newBoard = solve board [avoidTripleOne, 
-                                avoidTripleTwo, 
-                                avoidTripleThree, 
-                                completingRowOrColumn, 
-                                avoidingRowOrColumnDuplication,
-                                advancedTechniqueOne,
-                                advancedTechniqueTwo]
-    print newBoard
-
-
--- return converted board (from 10 to XO)
+    let solved = solve board [avoidTripleOne, 
+                     avoidTripleTwo, 
+                     avoidTripleThree, 
+                     completingRowOrColumn, 
+                     avoidingRowOrColumnDuplication,
+                     advancedTechniqueOne,
+                     advancedTechniqueTwo]
+    let converted = convertBoard solved
+    putStrLn converted
 
 ------------------------------------------------------------------------
 -- Reading input
@@ -82,4 +93,4 @@ main = do
     gameInfo <- getLine
     let board = gameType gameInfo
     board >>= solver -- this operator requires us to return IO
-     
+
