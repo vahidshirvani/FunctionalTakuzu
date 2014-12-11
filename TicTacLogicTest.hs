@@ -250,7 +250,7 @@ allTests = testGroup "TicTacLogicTests" [
         ,
         testGroup "Advanced technique 1" [
                 -- first test should return a complete board but not the second 
-                -- testSolveByEliminatingWrongs2 [[0,0,1,1],[-1,1,-1,0],[-1,0,-1,1],[1,1,0,0]] [[0,0,1,1],[0,1,1,0],[1,0,0,1],[1,1,0,0]]
+                testSolveByEliminatingWrongs2 1 [[-1,-1,-1,-1],[0,1,1,0],[1,0,0,1],[1,1,0,0]] [[0,-1,-1,-1],[0,1,1,0],[1,0,0,1],[1,1,0,0]]
             ]
     ]
 

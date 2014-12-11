@@ -33,7 +33,7 @@ fillRow xo row =
 foundTripleInRow :: Row -> Bool
 foundTripleInRow [] = False
 foundTripleInRow (x:y:z:xs) =
-    if (x == y) && (y == z)
+    if (x == y) && (x == z) && (x /= (-1))
         then True
         else foundTripleInRow (y:z:xs)
 foundTripleInRow (x:xs) =
@@ -49,7 +49,7 @@ foundTripleInRows (row:rows) =
 rowEqualOneRowInRows :: Row -> Board -> Bool
 rowEqualOneRowInRows rowA [] = False
 rowEqualOneRowInRows rowA (rowB:rows) =
-    if (rowA == rowB)
+    if (rowA == rowB && (countEmptyCells rowA) == 0)
         then True
         else rowEqualOneRowInRows rowA rows
 
@@ -60,12 +60,25 @@ twoRowsWereSimilar (row:rows) =
         then True
         else twoRowsWereSimilar rows
 
+equalOrLessOfType :: Board -> Bool
+equalOrLessOfType [] = True
+equalOrLessOfType (r:rs) =
+    let numOfOccurences0 = countCellsOfType 0 r
+        numOfOccurences1 = countCellsOfType 1 r
+        half = (div (length r) 2)
+    in
+        if (numOfOccurences0 <= half && numOfOccurences1 <= half)
+        then equalOrLessOfType rs
+        else False
+
 isValid :: Board -> Bool
 isValid board =
     (not (foundTripleInRows board)) &&
     (not (foundTripleInRows (transpose board))) &&
     (not (twoRowsWereSimilar board)) &&
-    (not (twoRowsWereSimilar (transpose board)))
+    (not (twoRowsWereSimilar (transpose board))) &&
+    (equalOrLessOfType board) &&
+    (equalOrLessOfType (transpose board))
 
 ------------------------------------------------------------------------
 -- Algorithms from conceptispuzzles
