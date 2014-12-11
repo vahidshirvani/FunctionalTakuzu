@@ -6,9 +6,37 @@ import TicTacLogic
 -- Solver
 ------------------------------------------------------------------------
 
-solver :: Board -> IO ()
-solver board = print board
+goThroughAllRules :: Board -> [(Board -> Board)] -> Board
+goThroughAllRules board [] = board
+goThroughAllRules board (rule:rules) =
+    let newBoard = runRule board rule
+    in 
+        if (isComplete newBoard)
+        then newBoard
+        else goThroughAllRules newBoard rules
 
+solve :: Board -> [(Board -> Board)] -> Board
+solve board rules =
+    let newBoard = goThroughAllRules board rules
+    in 
+        if (newBoard == board) -- it's either solved or it isn't solvable
+        then newBoard
+        else goThroughAllRules newBoard rules
+
+solver :: Board -> IO ()
+solver board = do
+    print board
+    let newBoard = solve board [avoidTripleOne, 
+                                avoidTripleTwo, 
+                                avoidTripleThree, 
+                                completingRowOrColumn, 
+                                avoidingRowOrColumnDuplication,
+                                advancedTechniqueOne,
+                                advancedTechniqueTwo]
+    print newBoard
+
+
+-- return converted board (from 10 to XO)
 
 ------------------------------------------------------------------------
 -- Reading input

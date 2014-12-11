@@ -17,6 +17,14 @@ countCellsOfType t = length . filter (== t)
 countEmptyCells :: Row -> Int
 countEmptyCells row = countCellsOfType (-1) row
 
+-- will check if the board contains any emtpy cells
+isComplete :: Board -> Bool
+isComplete [] = True
+isComplete (r:rs) = 
+    if (countEmptyCells r == 0)
+    then isComplete rs
+    else False
+
 -- fill the empty spots with the specified element
 fillRow :: Cell -> Row -> Row
 fillRow xo row =
