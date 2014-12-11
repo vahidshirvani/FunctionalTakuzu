@@ -76,6 +76,16 @@ testGetPossibleRows input1 input2 output = testCase
     "Testing 1 Row to find all possible combinations"
     (getPossibleRows input1 input2 @?= output)
 
+testGetIndexOfVerifiedBoard :: Cell -> Board -> [Row] -> Int -> Bool -> Int -> TestTree
+testGetIndexOfVerifiedBoard input1 input2 input3 input4 input5 output = testCase
+    "Testing 1 several rows to find index of verified row"
+    (getIndexOfVerifiedBoard input1 input2 input3 input4 input5 @?= output)
+
+testSolveByEliminatingWrongs :: Cell -> Board -> Board -> TestTree
+testSolveByEliminatingWrongs input1 input2 output = testCase
+    "Testing 1 Board that can be filled up, ONLY row-wise"
+    (solveByEliminatingWrongs input1 input2 @?= output)
+
 testAvoidTripleThree :: Board -> Board -> TestTree
 testAvoidTripleThree input output = testCase
     "Testing 1 Board that can be filled up"
@@ -123,6 +133,15 @@ testAvoidingRowOrColumnDuplication :: Board -> Board -> TestTree
 testAvoidingRowOrColumnDuplication input output = testCase
     "Testing 1 Board that can be filled up ((1,-1), (1,0))"
     (avoidingRowOrColumnDuplication input @?= output)
+
+--
+-- Advanced technique 1
+--
+
+testSolveByEliminatingWrongs2 :: Cell -> Board -> Board -> TestTree
+testSolveByEliminatingWrongs2 input1 input2 output = testCase
+    "Testing 1 Board that can be filled up, ONLY row-wise"
+    (solveByEliminatingWrongs2 input1 input2 @?= output)
 
 --
 -- Aggregate all tests and run
@@ -185,10 +204,18 @@ allTests = testGroup "TicTacLogicTests" [
                 testGetElementIndices 1 [-1,1,-1,1,-1,1] [1,3,5],
                 testGetElementIndices 1 [-1,-1,-1,-1,-1,-1] [],
 
-                -- test will check if returned indices are correct
-                testGetPossibleRows 1 [-1,1,-1,-1] [[1,1,-1,-1],[-1,1,1,-1],[-1,1,-1,1]]
+                -- test will check if returned rows are correct
+                testGetPossibleRows 1 [-1,1,-1,-1] [[1,1,-1,-1],[-1,1,1,-1],[-1,1,-1,1]],
 
-                --testAvoidTripleTree [[0,1,-1,0,-1,0,1,0]] [[0,1,1,0,1,0,1,0]]
+                -- test will check if returned indix for verified board is correct
+                testGetIndexOfVerifiedBoard 1 [[0,0,1,1],[-1,1,-1,0],[1,0,0,1],[1,1,0,0]] [[1,1,-1,0]] 1 False (0),
+                testGetIndexOfVerifiedBoard 1 [[0,-1,-1,1],[0,1,1,0],[1,0,0,1],[1,1,0,0]] [[0,-1,1,1]] 0 False (-1),
+
+                -- test will check if returned board is correct
+                testSolveByEliminatingWrongs 1 [[0,0,1,1],[-1,1,-1,0],[1,0,0,1],[1,1,0,0]] [[0,0,1,1],[0,1,-1,0],[1,0,0,1],[1,1,0,0]],
+
+                -- test will check if returned board is correct
+                testAvoidTripleThree [[0,0,1,1],[0,1,1,0],[1,0,-1,-1],[1,1,0,0]] [[0,0,1,1],[0,1,1,0],[1,0,0,-1],[1,1,0,0]]
             ]
         ,
         testGroup "Completing a row or a column" [
@@ -219,6 +246,11 @@ allTests = testGroup "TicTacLogicTests" [
 
                 -- first test should return a complete board but not the second 
                 testAvoidingRowOrColumnDuplication [[0,0,1,1],[-1,1,-1,0],[-1,0,-1,1],[1,1,0,0]] [[0,0,1,1],[0,1,1,0],[1,0,0,1],[1,1,0,0]]
+            ]
+        ,
+        testGroup "Advanced technique 1" [
+                -- first test should return a complete board but not the second 
+                -- testSolveByEliminatingWrongs2 [[0,0,1,1],[-1,1,-1,0],[-1,0,-1,1],[1,1,0,0]] [[0,0,1,1],[0,1,1,0],[1,0,0,1],[1,1,0,0]]
             ]
     ]
 
