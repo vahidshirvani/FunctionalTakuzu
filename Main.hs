@@ -6,34 +6,34 @@ import TicTacLogic
 -- Solver
 ------------------------------------------------------------------------
 
-convertRow :: Row -> [Char]
-convertRow row = 
+convertRow :: Row -> String
+convertRow row =
     let helper [] acc = acc
         helper (0:xs) acc = helper xs ('O':acc)
         helper (1:xs) acc = helper xs ('X':acc)
         helper ((-1):xs) acc = helper xs ('.':acc)
     in helper row []
 
-convertBoard :: Board -> [Char]
+convertBoard :: Board -> String
 convertBoard board = 
     let helper [] acc = reverse acc
-        helper (r:rs) acc = helper rs ((convertRow r) ++ "\r\n" ++ acc)
+        helper (r:rs) acc = helper rs (convertRow r ++ "\r\n" ++ acc)
     in helper board []
 
-goThroughAllRules :: Board -> [(Board -> Board)] -> Board
+goThroughAllRules :: Board -> [Board -> Board] -> Board
 goThroughAllRules board [] = board
 goThroughAllRules board (rule:rules) =
     let newBoard = runRule board rule
     in 
-        if (isComplete newBoard)
+        if isComplete newBoard
         then newBoard
         else goThroughAllRules newBoard rules
 
-solve :: Board -> [(Board -> Board)] -> Board
+solve :: Board -> [Board -> Board] -> Board
 solve board rules =
     let newBoard = goThroughAllRules board rules
     in 
-        if (newBoard == board) -- it's either solved or it isn't solvable
+        if newBoard == board -- it's either solved or it isn't solvable
         then newBoard
         else goThroughAllRules newBoard rules
 
@@ -53,8 +53,8 @@ solver board = do
 -- Reading input
 ------------------------------------------------------------------------
 
-charToIntList :: [Char] -> [Int] -> [Int]
-charToIntList [] list = (reverse list)
+charToIntList :: String -> [Int] -> [Int]
+charToIntList [] list = reverse list
 charToIntList ('X':xs) list = charToIntList xs (1:list)
 charToIntList ('O':xs) list = charToIntList xs (0:list)
 charToIntList ('.':xs) list = charToIntList xs (-1:list)
@@ -68,16 +68,16 @@ readLines :: Char -> Int -> Int -> Board -> IO Board
 readLines gameChar _ 0 board = return (reverse board)
 readLines gameChar gameSize rowsLeft board = do
     row <- getLine  -- X
-    let rowList = (charToIntList row [])
-    if (length rowList) == gameSize
+    let rowList = charToIntList row []
+    if length rowList == gameSize
         then readLines gameChar gameSize (rowsLeft - 1) (rowList:board)
         else printError "Invalid row length"
 
-gameType :: [Char] -> IO Board
+gameType :: String -> IO Board
 gameType ('T':xs) = do
-    let pairs = (map (\x -> read x :: Int) (words xs))
-    if ((pairs !! 0) == (pairs !! 1)) && ((mod (pairs !! 0) 2) == 0) 
-        then (readLines 'T' (pairs !! 0) (pairs !! 0) [])
+    let pairs = map (\x -> read x :: Int) (words xs)
+    if (head pairs == (pairs !! 1)) && (mod (head pairs) 2 == 0)
+        then readLines 'T' (head pairs) (head pairs) []
         else printError "incorrect input values"
 
 gameType ('S':xs) = printError "sudoku"
