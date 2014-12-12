@@ -230,7 +230,7 @@ allTests = testGroup "TicTacLogicTests" [
                 testGetPossibleRows 1 [-1,1,-1,-1] [[1,1,-1,-1],[-1,1,1,-1],[-1,1,-1,1]],
 
                 -- test will check if returned indix for verified board is correct
-                testGetIndexOfVerifiedBoard 1 [[0,0,1,1],[-1,1,-1,0],[1,0,0,1],[1,1,0,0]] [[1,1,-1,0]] 1 False (0),
+                testGetIndexOfVerifiedBoard 1 [[0,0,1,1],[-1,1,-1,0],[1,0,0,1],[1,1,0,0]] [[1,1,-1,0]] 1 False 0,
                 testGetIndexOfVerifiedBoard 1 [[0,-1,-1,1],[0,1,1,0],[1,0,0,1],[1,1,0,0]] [[0,-1,1,1]] 0 False (-1),
 
                 -- test will check if returned board is correct
