@@ -7,10 +7,16 @@
 module Main where
 
 import TicTacLogic
+import Data.Char (isSpace)
     
 ------------------------------------------------------------------------
 -- Producing Output
 ------------------------------------------------------------------------
+
+-- Source: http://en.wikipedia.org/wiki/Trim_(programming)#Haskell
+trim :: String -> String
+trim = f . f
+   where f = reverse . dropWhile isSpace
 
 convertRow :: Row -> String
 convertRow row =
@@ -23,13 +29,13 @@ convertRow row =
 convertBoard :: Board -> String
 convertBoard board = 
     let helper [] acc = reverse acc
-        helper (r:rs) acc = helper rs (convertRow r ++ "\r\n" ++ acc)
+        helper (r:rs) acc = helper rs (convertRow r ++ "\n" ++ acc)
     in helper board []
 
 solver :: Board -> IO ()
 solver board = do
     let solved = solve board
-    let converted = convertBoard solved
+    let converted = trim (convertBoard solved)
     putStrLn converted
 
 
@@ -40,7 +46,9 @@ solver board = do
 charToIntList :: String -> [Int] -> [Int]
 charToIntList [] list = reverse list
 charToIntList ('X':xs) list = charToIntList xs (1:list)
+charToIntList ('1':xs) list = charToIntList xs (1:list)
 charToIntList ('O':xs) list = charToIntList xs (0:list)
+charToIntList ('0':xs) list = charToIntList xs (0:list)
 charToIntList ('.':xs) list = charToIntList xs (-1:list)
 
 printError :: String -> IO Board

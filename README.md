@@ -33,9 +33,19 @@ $ cabal build
 $ cabal run
 ```
 
-## Testing
+## Unit Testing
 
 ```bash 
 $ cabal build test
 $ cabal test --show-details=always
+```
+
+## Black-box System Testing
+
+We use the Bash testing framework shunit2 to test our entire program.
+Installation:
+
+```bash
+$ apt-get install shunit2  ## debian, ubuntu, etc.
+$ brew install shunit2  ## homebrew of mac osx
 ```
