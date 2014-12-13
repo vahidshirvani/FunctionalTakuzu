@@ -1,3 +1,9 @@
+-- ----------------------------------------------------------------------------------------------
+-- @author Emanuel Stoeckli, Vahid Shirvani
+-- @date 2014-12
+-- @desc Tests for TicTac Logic Solver, Advanced Functional Programming, HT2014
+-- ----------------------------------------------------------------------------------------------
+
 module Main where
 
 import TicTacLogic

@@ -1,7 +1,7 @@
 -- ----------------------------------------------------------------------------------------------
 -- @author Emanuel Stoeckli, Vahid Shirvani
 -- @date 2014-12
--- @desc Advanced Functional Programming, HT2014
+-- @desc TicTac Logic Solver, Advanced Functional Programming, HT2014
 -- ----------------------------------------------------------------------------------------------
 
 module TicTacLogic where
