@@ -1,6 +1,26 @@
+-- ----------------------------------------------------------------------------------------------
+-- @author Emanuel Stoeckli, Vahid Shirvani
+-- @date 2014-12
+-- @desc Advanced Functional Programming, HT2014
+-- ----------------------------------------------------------------------------------------------
+
 module TicTacLogic where
 
 import Data.List (transpose)
+
+------------------------------------------------------------------------
+-- TicTac Logic Solver
+--
+-- Our tic-tac logic board game is based on a board that is defined with
+-- the type below. We basically represent the board with a list of
+-- 1, 0 and -1, where -1 is an empty cell.
+--
+-- To solve a takzu you can call the solve solve function which is defined
+-- in the end of this file.
+-- solve [[0,0],[1,0]]
+--
+-- Restriction: It only works for Takuzus that have 1 single solution
+------------------------------------------------------------------------
 
 type Cell = Int
 type Row = [Cell]
@@ -19,7 +39,7 @@ countEmptyCells = countCellsOfType (-1)
 
 -- will check if the board contains any emtpy cells
 isComplete :: Board -> Bool
-isComplete = foldr (\ r -> (&&) (countEmptyCells r == 0)) True
+isComplete = foldr (\ row -> (&&) (countEmptyCells row == 0)) True
 
 -- fill the empty spots with the specified element
 fillRow :: Cell -> Row -> Row
@@ -366,3 +386,31 @@ runRule board ruleFn =
     in if board == newBoard
             then board
             else runRule newBoard ruleFn
+
+
+listOfAllRuleFn :: [Board -> Board]
+listOfAllRuleFn = [ avoidTripleOne,
+                    avoidTripleTwo,
+                    avoidTripleThree,
+                    completingRowOrColumn,
+                    avoidingRowOrColumnDuplication,
+                    advancedTechniqueOne,
+                    advancedTechniqueTwo
+                    ]
+
+goThroughAllRules :: Board -> [Board -> Board] -> Board
+goThroughAllRules board [] = board
+goThroughAllRules board (rule:rules) =
+    let newBoard = runRule board rule
+    in
+        if isComplete newBoard
+        then newBoard
+        else goThroughAllRules newBoard rules
+
+solve :: Board -> Board
+solve board  =
+    let newBoard = goThroughAllRules board listOfAllRuleFn
+    in
+        if newBoard == board -- it's either solved or it isn't solvable
+        then newBoard
+        else goThroughAllRules newBoard listOfAllRuleFn

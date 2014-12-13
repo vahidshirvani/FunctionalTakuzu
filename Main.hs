@@ -1,9 +1,15 @@
+-- ----------------------------------------------------------------------------------------------
+-- @author Emanuel Stoeckli, Vahid Shirvani
+-- @date 2014-12
+-- @desc Advanced Functional Programming, HT2014
+-- ----------------------------------------------------------------------------------------------
+
 module Main where
 
 import TicTacLogic
     
 ------------------------------------------------------------------------
--- Solver
+-- Producing Output
 ------------------------------------------------------------------------
 
 convertRow :: Row -> String
@@ -20,37 +26,15 @@ convertBoard board =
         helper (r:rs) acc = helper rs (convertRow r ++ "\r\n" ++ acc)
     in helper board []
 
-goThroughAllRules :: Board -> [Board -> Board] -> Board
-goThroughAllRules board [] = board
-goThroughAllRules board (rule:rules) =
-    let newBoard = runRule board rule
-    in 
-        if isComplete newBoard
-        then newBoard
-        else goThroughAllRules newBoard rules
-
-solve :: Board -> [Board -> Board] -> Board
-solve board rules =
-    let newBoard = goThroughAllRules board rules
-    in 
-        if newBoard == board -- it's either solved or it isn't solvable
-        then newBoard
-        else goThroughAllRules newBoard rules
-
 solver :: Board -> IO ()
 solver board = do
-    let solved = solve board [avoidTripleOne, 
-                     avoidTripleTwo, 
-                     avoidTripleThree, 
-                     completingRowOrColumn, 
-                     avoidingRowOrColumnDuplication,
-                     advancedTechniqueOne,
-                     advancedTechniqueTwo]
+    let solved = solve board
     let converted = convertBoard solved
     putStrLn converted
 
+
 ------------------------------------------------------------------------
--- Reading input
+-- Reading Input
 ------------------------------------------------------------------------
 
 charToIntList :: String -> [Int] -> [Int]
