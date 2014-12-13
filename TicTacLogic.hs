@@ -12,12 +12,12 @@ import Data.List (transpose)
 -- TicTac Logic Solver
 --
 -- Our tic-tac logic board game is based on a board that is defined with
--- the type below. We basically represent the board with a list of
+-- the types below. We basically represent the board with a list of
 -- 1, 0 and -1, where -1 is an empty cell.
 --
--- To solve a takzu you can call the solve solve function which is defined
+-- To solve a takzu you can call the solve function which is defined
 -- in the end of this file.
--- solve [[0,0],[1,0]]
+-- Example: solve [[0,0],[1,0]]
 --
 -- Restriction: It only works for Takuzus that have 1 single solution
 ------------------------------------------------------------------------
