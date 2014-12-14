@@ -8,12 +8,20 @@ executable tic-tac-logic
   main-is:              Main.hs
   build-depends:        base
 
-Test-Suite test
+Test-Suite takuzu-test
     type:               exitcode-stdio-1.0
     main-is:            TicTacLogicTest.hs
     build-depends:      base,
                         tasty,
                         tasty-hunit
+
+Test-Suite sudoku-test
+    type:               exitcode-stdio-1.0
+    main-is:            SudokuLogicTest.hs
+    build-depends:      base,
+                        tasty,
+                        tasty-hunit
+
 
 
 
