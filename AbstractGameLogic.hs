@@ -79,6 +79,16 @@ getElementIndices xo row =
             else helper rs (i+1) acc
     in helper row 0 []
 
+-- get the indices were the element occur in the list
+replaceEmptyCellInRow :: Row -> Cell -> Row
+replaceEmptyCellInRow row newCell =
+    let helper [] _ acc = reverse acc
+        helper (r:rs) newCell acc =
+            if r == (-1)
+            then helper rs newCell (newCell:acc)
+            else helper rs newCell (r:acc)
+    in helper row newCell []
+
 -- put the specified element once in every empty spot and return all combinations
 getPossibleRows :: Cell -> Row -> [Row]
 getPossibleRows xo row =

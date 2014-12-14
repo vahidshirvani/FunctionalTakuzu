@@ -21,12 +21,18 @@ function test_Takuzu6x6 () {
     assertTrue '6x6 example from project description fails' $?
 }
 
-### first test ###
 function test_Takuzu8x8 () {
     > ./mainTests/8x8/result.txt  ## clear old test results
     cat ./mainTests/8x8/input.txt | ./dist/build/tic-tac-logic/tic-tac-logic > ./mainTests/8x8/result.txt
     diff mainTests/8x8/output.txt mainTests/8x8/result.txt
     assertTrue '8x8 example from project description fails' $?
+}
+
+function test_SudokuEasy () {
+    > ./mainTests/sudokuEasy/result.txt  ## clear old test results
+    cat ./mainTests/sudokuEasy/input.txt | ./dist/build/tic-tac-logic/tic-tac-logic > ./mainTests/sudokuEasy/result.txt
+    diff mainTests/sudokuEasy/output.txt mainTests/sudokuEasy/result.txt
+    assertTrue 'Easy Sudoku which can be solved by completing rows, columns and 3x3 sub boards' $?
 }
 
 ## Call and Run all Tests

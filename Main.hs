@@ -9,23 +9,28 @@ module Main where
 import AbstractGameLogic (Board,Cell,Row)
 import TicTacLogic
 import SudokuLogic
-import Data.Char (isSpace)
+import Data.Char (isSpace, digitToInt, intToDigit)
     
 ------------------------------------------------------------------------
 -- Output Calculation for both games
 ------------------------------------------------------------------------
-convertRow :: Row -> String
-convertRow row =
+convertRow :: Char -> Row -> String
+convertRow 'T' row =
     let helper [] acc = acc
         helper (0:xs) acc = helper xs ('O':acc)
         helper (1:xs) acc = helper xs ('X':acc)
         helper ((-1):xs) acc = helper xs ('.':acc)
     in helper row []
+convertRow 'S' row =
+    let helper [] acc = acc
+        helper ((-1):xs) acc = helper xs ('.':acc)
+        helper (x:xs) acc = helper xs (intToDigit x:acc)
+    in helper row []
 
-convertBoard :: Board -> String
-convertBoard board = 
+convertBoard :: Char -> Board -> String
+convertBoard gameChar board =
     let helper [] acc = reverse acc
-        helper (r:rs) acc = helper rs (convertRow r ++ "\n" ++ acc)
+        helper (r:rs) acc = helper rs (convertRow gameChar r ++ "\n" ++ acc)
     in helper board []
 
 -- Source: http://en.wikipedia.org/wiki/Trim_(programming)#Haskell
@@ -38,7 +43,7 @@ solver gameChar board = do
     let solved = if gameChar == 'T'
                  then TicTacLogic.solveTakuzu board
                  else SudokuLogic.solveSudoku board
-    let converted = trim (convertBoard solved)
+    let converted = trim (convertBoard gameChar solved)
     putStrLn converted
 
 
@@ -52,6 +57,7 @@ charToIntList 'T' ('1':xs) list = charToIntList 'T' xs (1:list)
 charToIntList 'T' ('O':xs) list = charToIntList 'T' xs (0:list)
 charToIntList 'T' ('0':xs) list = charToIntList 'T' xs (0:list)
 charToIntList gameChar ('.':xs) list = charToIntList gameChar xs (-1:list)
+charToIntList 'S' (x:xs) list = charToIntList 'S' xs (digitToInt x:list)
 
 printError :: String -> IO Board
 printError msg = do
