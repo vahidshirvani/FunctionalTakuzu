@@ -94,4 +94,4 @@ main :: IO ()
 main = do
     gameInfo <- getLine
     let board = gameType gameInfo
-    board >>= (solver (head gameInfo))
+    board >>= solver (head gameInfo)
