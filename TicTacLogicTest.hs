@@ -6,7 +6,17 @@
 
 module Main where
 
-import AbstractGameLogic (Board,Row,Cell,runRule)
+import AbstractGameLogic (Board,Row,Cell
+                          ,runRule
+                          ,applyOnceInBothDirections
+                          ,applyRowFnUnidirectional
+                          ,applyRowFnBidirectional
+                          ,replaceRowInBoard
+                          ,replaceElementInRow
+                          ,indexOfElement
+                          ,getElementIndices
+                          ,getPossibleRows
+                          ,getCompleteRows)
 import TicTacLogic
 import Test.Tasty
 import Test.Tasty.HUnit

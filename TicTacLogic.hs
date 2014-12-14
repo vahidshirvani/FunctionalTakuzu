@@ -84,24 +84,6 @@ isValid board =
 ------------------------------------------------------------------------
 
 --
--- High-order functions
---
-
-applyOnceInBothDirections :: Board -> (Row -> Row) -> Board
-applyOnceInBothDirections board rowFn =
-    let rowsFixedBoard = map rowFn board
-        transposedBoard = transpose rowsFixedBoard
-        colsFixedBoard = map rowFn transposedBoard
-        newFixedBoard = transpose colsFixedBoard
-    in newFixedBoard
-
-applyRowFnUnidirectional :: (Row -> Row -> Row) -> Row -> Row
-applyRowFnUnidirectional rowFn = rowFn []
-
-applyRowFnBidirectional :: (Row -> Row -> Row) -> Row -> Row
-applyRowFnBidirectional rowFn = rowFn [] . rowFn []
-
---
 -- Avoiding triples 1
 -- = Basic techniques 1
 --
@@ -118,7 +100,6 @@ avoidTripleForward acc (x:y:z:xs) =  -- > 2 cells remaining
 avoidTripleForward acc (z:xs) = avoidTripleForward (z:acc) xs   -- 1 or 2 cells remaining
 
 
--- avoidTripleOne [[-1,1,-1,-1,-1,-1],[0,0,-1,-1,1,1],[0,1,0,1,0,1],[-1,1,-1,-1,-1,-1]]
 avoidTripleOne :: Board -> Board
 avoidTripleOne board = applyOnceInBothDirections board (applyRowFnBidirectional avoidTripleForward)
 
@@ -153,52 +134,10 @@ avoidTripleTwo board = applyOnceInBothDirections board (applyRowFnUnidirectional
 -- but if they are neighbours with a neighbour 1 this would be invalid
 -- if half of the row is of the same type, e.g. 0, we have to fill up cells with 1
 --
-
 xStepBeforeFinish :: Cell -> Cell -> Row -> Bool
 xStepBeforeFinish empty t row =
     let numOfOccurences = countCellsOfType t row
     in ((numOfOccurences + empty) == div (length row) 2)  -- + 1 because we can make a move
-
-indexOfElement :: Cell -> Row -> Int 
-indexOfElement elem list =
-    let helper [] cnt = -1
-        helper (x:xs) cnt =
-            if x == elem
-            then cnt
-            else helper xs (cnt+1)
-    in helper list 0
-
--- replace the element in the specified index with the given element
-replaceElementInRow :: Int -> Cell -> Row -> Row
-replaceElementInRow index xo row =
-    let helper i [] acc = reverse acc
-        helper 0 (r:rs) acc = helper (-1) rs (xo:acc)
-        helper i (r:rs) acc = helper (i-1) rs (r:acc)
-    in helper index row []
-
--- replace the row in the specified index with the given row
-replaceRowInBoard :: Int -> Row -> Board -> Board
-replaceRowInBoard index row board =
-    let helper i [] acc = reverse acc
-        helper 0 (x:xs) acc = helper (-1) xs (row:acc)
-        helper i (x:xs) acc = helper (i-1) xs (x:acc)
-    in helper index board []
-
--- get the indices were the element occur in the list
-getElementIndices :: Cell -> Row -> [Int]
-getElementIndices xo row =
-    let helper [] i acc = reverse acc
-        helper (r:rs) i acc =
-            if r == xo
-            then helper rs (i+1) (i:acc)
-            else helper rs (i+1) acc
-    in helper row 0 []
-
--- put the specified element once in every empty spot and return all combinations
-getPossibleRows :: Cell -> Row -> [Row]
-getPossibleRows xo row =
-    let emptyIndices = getElementIndices (-1) row
-    in [replaceElementInRow spot xo row | spot <- emptyIndices]
 
 getIndexOfVerifiedBoard :: Cell -> Board -> [Row] -> Int -> Bool -> Int
 getIndexOfVerifiedBoard xo board rows index cond =
@@ -288,16 +227,6 @@ compareRowAgainstRows row (r:rs) =
         if result == row
         then compareRowAgainstRows row rs
         else result
-
--- will return a list of all the complete rows in the board
-getCompleteRows :: Board -> [Row]
-getCompleteRows board =
-    let helper [] acc = reverse acc
-        helper (r:rs) acc =
-            if countEmptyCells r == 0
-            then helper rs (r:acc)
-            else helper rs acc
-    in helper board []
 
 -- goes through the board row-wise and tries to fill the rows
 -- that only have two empty spots left
