@@ -72,8 +72,8 @@ gameType ('T':xs) = do
         then readLines 'T' (head pairs) (head pairs) []
         else printError "incorrect input values"
 
-gameType ('S':xs) = printError "sudoku"
-gameType _ = printError "unknown character"
+gameType ('S':xs) = printError "Sudoku"
+gameType _ = printError "Unknown character"
 
 
 ------------------------------------------------------------------------
