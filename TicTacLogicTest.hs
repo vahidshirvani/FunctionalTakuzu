@@ -6,6 +6,7 @@
 
 module Main where
 
+import AbstractGameLogic (Board,Row,Cell,runRule)
 import TicTacLogic
 import Test.Tasty
 import Test.Tasty.HUnit

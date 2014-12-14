@@ -6,6 +6,7 @@
 
 module TicTacLogic where
 
+import AbstractGameLogic
 import Data.List (transpose)
 
 ------------------------------------------------------------------------
@@ -22,24 +23,10 @@ import Data.List (transpose)
 -- Restriction: It only works for Takuzus that have 1 single solution
 ------------------------------------------------------------------------
 
-type Cell = Int
-type Row = [Cell]
-type Board = [Row]
-
 opposite :: Int -> Int
 opposite 1 = 0
 opposite 0 = 1
 opposite (-1) = -1  -- the opposite of an empty cell is an empty cell
-
-countCellsOfType :: Cell -> Row -> Int
-countCellsOfType t = length . filter (== t)
-
-countEmptyCells :: Row -> Int
-countEmptyCells = countCellsOfType (-1)
-
--- will check if the board contains any emtpy cells
-isComplete :: Board -> Bool
-isComplete = foldr (\ row -> (&&) (countEmptyCells row == 0)) True
 
 -- fill the empty spots with the specified element
 fillRow :: Cell -> Row -> Row
@@ -376,20 +363,11 @@ advancedTechniqueTwo = avoidTripleThree
 
 
 --
--- Run Logic
+-- Rule Aggregation
 --
 
--- runRule [[-1,1,-1,-1,-1,-1],[0,0,-1,-1,1,1],[0,1,0,1,0,1],[-1,1,-1,-1,-1,-1]] avoidTripleOne
-runRule :: Board -> (Board -> Board) -> Board
-runRule board ruleFn =
-    let newBoard = ruleFn board
-    in if board == newBoard
-            then board
-            else runRule newBoard ruleFn
-
-
-listOfAllRuleFn :: [Board -> Board]
-listOfAllRuleFn = [ avoidTripleOne,
+takuzuRuleFnList :: [Board -> Board]
+takuzuRuleFnList = [ avoidTripleOne,
                     avoidTripleTwo,
                     avoidTripleThree,
                     completingRowOrColumn,
@@ -398,19 +376,5 @@ listOfAllRuleFn = [ avoidTripleOne,
                     advancedTechniqueTwo
                     ]
 
-goThroughAllRules :: Board -> [Board -> Board] -> Board
-goThroughAllRules board [] = board
-goThroughAllRules board (rule:rules) =
-    let newBoard = runRule board rule
-    in
-        if isComplete newBoard
-        then newBoard
-        else goThroughAllRules newBoard rules
-
-solve :: Board -> Board
-solve board  =
-    let newBoard = goThroughAllRules board listOfAllRuleFn
-    in
-        if newBoard == board -- it's either solved or it isn't solvable
-        then newBoard
-        else goThroughAllRules newBoard listOfAllRuleFn
+solveTakuzu :: Board -> Board
+solveTakuzu board = AbstractGameLogic.solve board takuzuRuleFnList

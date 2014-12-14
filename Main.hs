@@ -6,18 +6,14 @@
 
 module Main where
 
+import AbstractGameLogic (Board,Cell,Row)
 import TicTacLogic
+import SudokuLogic
 import Data.Char (isSpace)
     
 ------------------------------------------------------------------------
--- Producing Output
+-- Output Calculation for both games
 ------------------------------------------------------------------------
-
--- Source: http://en.wikipedia.org/wiki/Trim_(programming)#Haskell
-trim :: String -> String
-trim = f . f
-   where f = reverse . dropWhile isSpace
-
 convertRow :: Row -> String
 convertRow row =
     let helper [] acc = acc
@@ -32,24 +28,30 @@ convertBoard board =
         helper (r:rs) acc = helper rs (convertRow r ++ "\n" ++ acc)
     in helper board []
 
-solver :: Board -> IO ()
-solver board = do
-    let solved = solve board
+-- Source: http://en.wikipedia.org/wiki/Trim_(programming)#Haskell
+trim :: String -> String
+trim = f . f
+   where f = reverse . dropWhile isSpace
+
+solver :: Char -> Board -> IO ()
+solver gameChar board = do
+    let solved = if gameChar == 'T'
+                 then TicTacLogic.solveTakuzu board
+                 else SudokuLogic.solveSudoku board
     let converted = trim (convertBoard solved)
     putStrLn converted
 
 
 ------------------------------------------------------------------------
--- Reading Input
+-- Input readers for both games
 ------------------------------------------------------------------------
-
-charToIntList :: String -> [Int] -> [Int]
-charToIntList [] list = reverse list
-charToIntList ('X':xs) list = charToIntList xs (1:list)
-charToIntList ('1':xs) list = charToIntList xs (1:list)
-charToIntList ('O':xs) list = charToIntList xs (0:list)
-charToIntList ('0':xs) list = charToIntList xs (0:list)
-charToIntList ('.':xs) list = charToIntList xs (-1:list)
+charToIntList :: Char -> String -> [Int] -> [Int]
+charToIntList _ [] list = reverse list
+charToIntList 'T' ('X':xs) list = charToIntList 'T' xs (1:list)
+charToIntList 'T' ('1':xs) list = charToIntList 'T' xs (1:list)
+charToIntList 'T' ('O':xs) list = charToIntList 'T' xs (0:list)
+charToIntList 'T' ('0':xs) list = charToIntList 'T' xs (0:list)
+charToIntList gameChar ('.':xs) list = charToIntList gameChar xs (-1:list)
 
 printError :: String -> IO Board
 printError msg = do
@@ -60,29 +62,30 @@ readLines :: Char -> Int -> Int -> Board -> IO Board
 readLines gameChar _ 0 board = return (reverse board)
 readLines gameChar gameSize rowsLeft board = do
     row <- getLine  -- X
-    let rowList = charToIntList row []
+    let rowList = charToIntList gameChar row []
     if length rowList == gameSize
         then readLines gameChar gameSize (rowsLeft - 1) (rowList:board)
         else printError "Invalid row length"
 
+
+------------------------------------------------------------------------
+-- Game Split
+------------------------------------------------------------------------
 gameType :: String -> IO Board
 gameType ('T':xs) = do
     let pairs = map (\x -> read x :: Int) (words xs)
     if (head pairs == (pairs !! 1)) && (mod (head pairs) 2 == 0)
         then readLines 'T' (head pairs) (head pairs) []
         else printError "incorrect input values"
-
-gameType ('S':xs) = printError "Sudoku"
+gameType ('S':xs) = readLines 'S' 9 9 []
 gameType _ = printError "Unknown character"
 
 
 ------------------------------------------------------------------------
 -- Main
 ------------------------------------------------------------------------
-
 main :: IO ()
 main = do
     gameInfo <- getLine
     let board = gameType gameInfo
-    board >>= solver -- this operator requires us to return IO
-
+    board >>= (solver (head gameInfo))
